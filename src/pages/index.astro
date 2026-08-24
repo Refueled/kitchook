@@ -1,5 +1,8 @@
 ---
+import { getPublishedRecipes } from '../lib/recipes';
+
 const title = 'Kitchook';
+const recipes = await getPublishedRecipes();
 ---
 
 <!doctype html>
@@ -16,7 +19,14 @@ const title = 'Kitchook';
   <body>
     <main>
       <h1>{title}</h1>
-      <p>Phase 0 bootstrap is complete. Recipes are coming in a later phase.</p>
+      <p>Recipes published from the canonical Markdown collection.</p>
+
+      <h2>Recipes</h2>
+      <ul>
+        {recipes.map((recipe) => (
+          <li><a href={`/recipes/${recipe.id}/`}>{recipe.data.title}</a></li>
+        ))}
+      </ul>
     </main>
   </body>
 </html>

@@ -1,0 +1,101 @@
+---
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import { getPublishedRecipes, type RecipeEntry } from '../../lib/recipes';
+
+export async function getStaticPaths() {
+  const recipes = await getPublishedRecipes();
+
+  return recipes.map((recipe) => ({
+    params: { slug: recipe.id },
+    props: { recipe },
+  }));
+}
+
+interface Props {
+  recipe: RecipeEntry;
+}
+
+const { recipe } = Astro.props;
+const { Content } = await render(recipe);
+const { data } = recipe;
+const sourceLabel = data.source?.name ?? data.source?.url;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={data.description ?? data.title} />
+    <title>{data.title} | Kitchook</title>
+  </head>
+  <body>
+    <main>
+      <nav aria-label="Breadcrumb">
+        <a href="/">Kitchook</a>
+      </nav>
+
+      <article>
+        <header>
+          <h1>{data.title}</h1>
+          {data.description && <p>{data.description}</p>}
+
+          {data.image && <Image src={data.image} alt={data.title} />}
+
+          <dl>
+            {data.prep_minutes !== undefined && (
+              <>
+                <dt>Preparation time</dt>
+                <dd>{data.prep_minutes} minutes</dd>
+              </>
+            )}
+            {data.cook_minutes !== undefined && (
+              <>
+                <dt>Cooking time</dt>
+                <dd>{data.cook_minutes} minutes</dd>
+              </>
+            )}
+            {data.total_minutes !== undefined && (
+              <>
+                <dt>Total time</dt>
+                <dd>{data.total_minutes} minutes</dd>
+              </>
+            )}
+            {data.servings !== undefined && (
+              <>
+                <dt>Servings</dt>
+                <dd>{data.servings}</dd>
+              </>
+            )}
+            {data.difficulty && (
+              <>
+                <dt>Difficulty</dt>
+                <dd>{data.difficulty}</dd>
+              </>
+            )}
+            {data.tags.length > 0 && (
+              <>
+                <dt>Tags</dt>
+                <dd>{data.tags.join(', ')}</dd>
+              </>
+            )}
+          </dl>
+
+          {data.source && sourceLabel && (
+            <p>
+              Source:{' '}
+              {data.source.url ? (
+                <a href={data.source.url}>{sourceLabel}</a>
+              ) : (
+                sourceLabel
+              )}
+            </p>
+          )}
+        </header>
+
+        <Content />
+      </article>
+    </main>
+  </body>
+</html>

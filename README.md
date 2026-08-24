@@ -4,7 +4,7 @@ Kitchook is a self-hosted cookbook built from plain Markdown recipes. Recipe con
 
 ## Status
 
-Phase 0 repository bootstrap is complete. Recipe loading, schemas, search, and the full cookbook interface are planned for later phases.
+Phase 1's recipe content pipeline is complete: Astro validates the collection, resolves colocated images, generates recipe routes, and excludes unpublished content. Layout, recipe cards, and search remain deferred to later phases.
 
 See [PROJECT_PLAN.md](PROJECT_PLAN.md) for the architecture and implementation roadmap.
 
@@ -29,12 +29,61 @@ npm run build    # Build the static site into dist/
 npm run preview  # Preview the production build locally
 ```
 
+## Authoring recipes
+
+Each recipe is a self-contained package under the top-level `recipes/` directory:
+
+```text
+recipes/
+└── chicken-tikka-masala/
+    ├── recipe.md
+    └── hero.jpg
+```
+
+The directory name must be a lowercase kebab-case slug. It is the stable recipe ID and generates `/recipes/chicken-tikka-masala/`; frontmatter cannot override it. Avoid renaming a published recipe directory.
+
+`recipe.md` uses YAML frontmatter followed by ordinary Markdown. Only a non-blank `title` is required:
+
+```md
+---
+title: Garlic Butter Pasta
+---
+
+## Ingredients
+
+- 8 oz spaghetti
+
+## Instructions
+
+1. Cook the pasta.
+```
+
+Supported optional frontmatter fields are:
+
+- `description`, `aliases`, `tags`, `categories`, `cuisine`, and `meal`
+- `prep_minutes`, `cook_minutes`, and `total_minutes` (nonnegative integers)
+- `servings` (a nonnegative integer or non-blank string)
+- `difficulty` (`easy`, `medium`, or `hard`)
+- `favorite` (defaults to `false`)
+- `image`, resolved relative to `recipe.md`
+- `source` with optional `name` and valid `url`
+- `created` and `updated` dates
+- `status` (`active`, `draft`, or `archived`; defaults to `active`)
+
+List fields default to empty arrays. Unknown frontmatter fields and invalid metadata fail the build. Use conventional `## Ingredients`, `## Instructions`, `## Notes`, and optional subsection headings in the Markdown body; active recipes must have a non-empty body.
+
+Put recipe images beside `recipe.md` and reference them by filename, for example `image: hero.jpg`. A referenced image must exist and be valid. Astro validates and optimizes it during the static build.
+
+Only `active` recipes appear on the homepage or receive generated routes. `draft` and `archived` recipes remain validated canonical content but are not published.
+
 ## Repository layout
 
 ```text
-recipes/             Canonical, framework-independent recipe content
-src/pages/           Astro pages
-astro.config.mjs     Astro configuration
-tsconfig.json        Strict TypeScript configuration
-PROJECT_PLAN.md      Architecture and phased implementation roadmap
+recipes/                    Canonical, framework-independent recipe content
+src/content.config.ts       Recipe loader and validation schema
+src/lib/recipes.ts          Active-recipe publication query
+src/pages/                  Astro pages and generated recipe route
+astro.config.mjs            Astro configuration
+tsconfig.json               Strict TypeScript configuration
+PROJECT_PLAN.md             Architecture and phased implementation roadmap
 ```
