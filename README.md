@@ -4,7 +4,9 @@ Kitchook is a self-hosted cookbook built from plain Markdown recipes. Recipe con
 
 ## Status
 
-Phase 1's recipe content pipeline is complete: Astro validates the collection, resolves colocated images, generates recipe routes, and excludes unpublished content. Layout, recipe cards, and search remain deferred to later phases.
+Phase 2's core interface is complete. Astro validates the collection, resolves and optimizes colocated images, generates active recipe routes, and presents them through a responsive cooking-first interface. The site uses semantic HTML and plain CSS, works without JavaScript, follows the operating system's light or dark preference, and includes ink-conscious recipe print styles.
+
+Full-text search remains deferred to Phase 3. The current homepage intentionally presents one alphabetized all-recipes grid; favorites are marked on their cards rather than duplicated into a separate section.
 
 See [PROJECT_PLAN.md](PROJECT_PLAN.md) for the architecture and implementation roadmap.
 
@@ -82,7 +84,10 @@ Only `active` recipes appear on the homepage or receive generated routes. `draft
 recipes/                    Canonical, framework-independent recipe content
 src/content.config.ts       Recipe loader and validation schema
 src/lib/recipes.ts          Active-recipe publication query
+src/components/             Server-rendered recipe cards and shared metadata
+src/layouts/BaseLayout.astro Shared document shell and site chrome
 src/pages/                  Astro pages and generated recipe route
+src/styles/global.css        Responsive, dark-mode, and print presentation
 astro.config.mjs            Astro configuration
 tsconfig.json               Strict TypeScript configuration
 PROJECT_PLAN.md             Architecture and phased implementation roadmap

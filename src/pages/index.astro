@@ -1,32 +1,29 @@
 ---
+import RecipeCard from '../components/RecipeCard.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 import { getPublishedRecipes } from '../lib/recipes';
 
-const title = 'Kitchook';
 const recipes = await getPublishedRecipes();
+const recipeCount = `${recipes.length} published ${recipes.length === 1 ? 'recipe' : 'recipes'}`;
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <meta
-      name="description"
-      content="Kitchook is a static cookbook built from Markdown recipes."
-    />
-    <title>{title}</title>
-  </head>
-  <body>
-    <main>
-      <h1>{title}</h1>
-      <p>Recipes published from the canonical Markdown collection.</p>
+<BaseLayout
+  title="Kitchook"
+  description="A fast, static cookbook of practical recipes kept in Markdown."
+>
+  <section class="home-intro" aria-labelledby="home-title">
+    <h1 id="home-title">Everything worth making</h1>
+    <p>Pick a recipe, get cooking, and keep the screen clutter out of the kitchen.</p>
+  </section>
 
-      <h2>Recipes</h2>
-      <ul>
-        {recipes.map((recipe) => (
-          <li><a href={`/recipes/${recipe.id}/`}>{recipe.data.title}</a></li>
-        ))}
-      </ul>
-    </main>
-  </body>
-</html>
+  <section aria-labelledby="recipes-heading">
+    <div class="collection-heading">
+      <h2 id="recipes-heading">All recipes</h2>
+      <p class="recipe-count">{recipeCount}</p>
+    </div>
+
+    <div class="recipe-grid">
+      {recipes.map((recipe) => <RecipeCard recipe={recipe} />)}
+    </div>
+  </section>
+</BaseLayout>

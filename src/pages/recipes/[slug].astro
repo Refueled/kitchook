@@ -1,6 +1,8 @@
 ---
 import { Image } from 'astro:assets';
 import { render } from 'astro:content';
+import RecipeMeta from '../../components/RecipeMeta.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getPublishedRecipes, type RecipeEntry } from '../../lib/recipes';
 
 export async function getStaticPaths() {
@@ -20,82 +22,84 @@ const { recipe } = Astro.props;
 const { Content } = await render(recipe);
 const { data } = recipe;
 const sourceLabel = data.source?.name ?? data.source?.url;
+const hasMeta =
+  data.prep_minutes !== undefined ||
+  data.cook_minutes !== undefined ||
+  data.total_minutes !== undefined ||
+  data.servings !== undefined ||
+  data.difficulty !== undefined;
+const hasTaxonomy = data.tags.length > 0 || Boolean(data.source && sourceLabel);
+const hasOverview = hasMeta || Boolean(data.image) || hasTaxonomy;
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="description" content={data.description ?? data.title} />
-    <title>{data.title} | Kitchook</title>
-  </head>
-  <body>
-    <main>
-      <nav aria-label="Breadcrumb">
-        <a href="/">Kitchook</a>
-      </nav>
+<BaseLayout
+  title={`${data.title} | Kitchook`}
+  description={data.description ?? `Cook ${data.title} with Kitchook.`}
+  mainClass="recipe-page"
+>
+  <div class="recipe-shell">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/"><span aria-hidden="true">←</span>&nbsp; All recipes</a>
+    </nav>
 
-      <article>
-        <header>
+    <article>
+      <header>
+        <div class="recipe-heading-panel">
           <h1>{data.title}</h1>
-          {data.description && <p>{data.description}</p>}
+          {data.description && <p class="recipe-heading-panel__description">{data.description}</p>}
+        </div>
 
-          {data.image && <Image src={data.image} alt={data.title} />}
+        {hasOverview && (
+          <div class="recipe-overview">
+            {hasMeta && (
+              <RecipeMeta
+                prepMinutes={data.prep_minutes}
+                cookMinutes={data.cook_minutes}
+                totalMinutes={data.total_minutes}
+                servings={data.servings}
+                difficulty={data.difficulty}
+              />
+            )}
 
-          <dl>
-            {data.prep_minutes !== undefined && (
-              <>
-                <dt>Preparation time</dt>
-                <dd>{data.prep_minutes} minutes</dd>
-              </>
+            {data.image && (
+              <figure class="recipe-hero">
+                <Image
+                  src={data.image}
+                  alt={data.title}
+                  widths={[640, 960, 1280]}
+                  sizes="(max-width: 50rem) calc(100vw - 2rem), 48rem"
+                />
+              </figure>
             )}
-            {data.cook_minutes !== undefined && (
-              <>
-                <dt>Cooking time</dt>
-                <dd>{data.cook_minutes} minutes</dd>
-              </>
-            )}
-            {data.total_minutes !== undefined && (
-              <>
-                <dt>Total time</dt>
-                <dd>{data.total_minutes} minutes</dd>
-              </>
-            )}
-            {data.servings !== undefined && (
-              <>
-                <dt>Servings</dt>
-                <dd>{data.servings}</dd>
-              </>
-            )}
-            {data.difficulty && (
-              <>
-                <dt>Difficulty</dt>
-                <dd>{data.difficulty}</dd>
-              </>
-            )}
-            {data.tags.length > 0 && (
-              <>
-                <dt>Tags</dt>
-                <dd>{data.tags.join(', ')}</dd>
-              </>
-            )}
-          </dl>
 
-          {data.source && sourceLabel && (
-            <p>
-              Source:{' '}
-              {data.source.url ? (
-                <a href={data.source.url}>{sourceLabel}</a>
-              ) : (
-                sourceLabel
-              )}
-            </p>
-          )}
-        </header>
+            {hasTaxonomy && (
+              <div class="recipe-taxonomy">
+                {data.tags.length > 0 && (
+                  <p class="recipe-tags">
+                    <span class="recipe-tags__label">Tags:</span>
+                    {data.tags.map((tag) => <span class="tag">{tag}</span>)}
+                  </p>
+                )}
 
+                {data.source && sourceLabel && (
+                  <p class="recipe-source">
+                    <span class="recipe-source__label">Source:</span>{' '}
+                    {data.source.url ? (
+                      <a class="source-link" href={data.source.url}>{sourceLabel}</a>
+                    ) : (
+                      sourceLabel
+                    )}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </header>
+
+      <div class="recipe-content">
         <Content />
-      </article>
-    </main>
-  </body>
-</html>
+      </div>
+    </article>
+  </div>
+</BaseLayout>

@@ -1,0 +1,52 @@
+---
+type Variant = 'card' | 'detail';
+type Difficulty = 'easy' | 'medium' | 'hard';
+
+interface Props {
+  prepMinutes?: number;
+  cookMinutes?: number;
+  totalMinutes?: number;
+  servings?: number | string;
+  difficulty?: Difficulty;
+  variant?: Variant;
+}
+
+const {
+  prepMinutes,
+  cookMinutes,
+  totalMinutes,
+  servings,
+  difficulty,
+  variant = 'detail',
+} = Astro.props;
+
+const formatMinutes = (minutes: number) => `${minutes} min`;
+const items: Array<{ label: string; value: string; kind?: string }> = [];
+
+if (variant === 'detail') {
+  if (prepMinutes !== undefined) items.push({ label: 'Prep', value: formatMinutes(prepMinutes) });
+  if (cookMinutes !== undefined) items.push({ label: 'Cook', value: formatMinutes(cookMinutes) });
+  if (totalMinutes !== undefined) items.push({ label: 'Total', value: formatMinutes(totalMinutes) });
+} else if (totalMinutes !== undefined) {
+  items.push({ label: 'Total', value: formatMinutes(totalMinutes) });
+} else {
+  if (prepMinutes !== undefined) items.push({ label: 'Prep', value: formatMinutes(prepMinutes) });
+  if (cookMinutes !== undefined) items.push({ label: 'Cook', value: formatMinutes(cookMinutes) });
+}
+
+if (servings !== undefined) {
+  items.push({ label: variant === 'card' ? 'Serves' : 'Servings', value: String(servings) });
+}
+if (difficulty) items.push({ label: 'Difficulty', value: difficulty, kind: 'difficulty' });
+---
+
+{items.length > 0 && (
+  <dl class:list={["recipe-meta", `recipe-meta--${variant}`]}>
+    {items.map((item) => (
+      <div class="recipe-meta__item">
+        <dt>{item.label}</dt>
+        <dd class:list={{ "recipe-meta__difficulty": item.kind === 'difficulty' }}>{item.value}</dd>
+      </div>
+    ))}
+  </dl>
+)}

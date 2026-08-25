@@ -1,0 +1,43 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  mainClass?: string;
+}
+
+const { title, description, mainClass } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="light dark" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to recipe content</a>
+
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="wordmark" href="/" aria-label="Kitchook home">Kitchook<span aria-hidden="true">!</span></a>
+        <p class="site-tagline">Cook from the source.</p>
+      </div>
+    </header>
+
+    <main id="main-content" class:list={["site-main", mainClass]}>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        <p><strong>Kitchook</strong> — recipes kept in Markdown and served fresh.</p>
+        <a href="#main-content">Back to top</a>
+      </div>
+    </footer>
+  </body>
+</html>

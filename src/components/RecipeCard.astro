@@ -1,0 +1,47 @@
+---
+import { Image } from 'astro:assets';
+import type { RecipeEntry } from '../lib/recipes';
+import RecipeMeta from './RecipeMeta.astro';
+
+interface Props {
+  recipe: RecipeEntry;
+}
+
+const { recipe } = Astro.props;
+const { data } = recipe;
+---
+
+<article class="recipe-card">
+  <a class="recipe-card__link" href={`/recipes/${recipe.id}/`}>
+    <div class:list={["recipe-card__media", { "recipe-card__media--fallback": !data.image }]}>
+      {data.image ? (
+        <Image
+          src={data.image}
+          alt=""
+          widths={[480, 720]}
+          sizes="(max-width: 42rem) calc(100vw - 2rem), (max-width: 72rem) 50vw, 24rem"
+          loading="lazy"
+        />
+      ) : (
+        <span class="recipe-card__fallback-copy" aria-hidden="true">
+          Make.<br />Eat.<br />Repeat.
+        </span>
+      )}
+    </div>
+
+    <div class="recipe-card__body">
+      {data.favorite && <span class="favorite-badge">★ Favorite</span>}
+      <h3>{data.title}</h3>
+      {data.description && <p class="recipe-card__description">{data.description}</p>}
+      <RecipeMeta
+        variant="card"
+        prepMinutes={data.prep_minutes}
+        cookMinutes={data.cook_minutes}
+        totalMinutes={data.total_minutes}
+        servings={data.servings}
+        difficulty={data.difficulty}
+      />
+      <span class="recipe-card__cta">Cook this <span aria-hidden="true">→</span></span>
+    </div>
+  </a>
+</article>
