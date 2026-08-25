@@ -1,5 +1,39 @@
 /* Kitchook's deliberately small, no-JavaScript design system. */
 @font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 100 1000;
+  font-display: swap;
+  src: url("/fonts/dm-sans-variable-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bricolage Grotesque";
+  font-style: normal;
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+  font-display: swap;
+  src: url("/fonts/bricolage-grotesque-variable-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Google Sans Flex";
+  font-style: normal;
+  font-weight: 550;
+  font-stretch: 35%;
+  font-display: swap;
+  src: url("/fonts/google-sans-flex-variable-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "M PLUS U";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/m-plus-u-variable-latin.woff2") format("woff2");
+}
+
+@font-face {
   font-family: "Syne";
   font-style: normal;
   font-weight: 400 800;
@@ -15,10 +49,10 @@
   --muted: #5a5045;
   --border: #171717;
   --shadow: #171717;
-  --yellow: #ffd83d;
-  --coral: #ff6b5f;
+  --yellow: #fae8a4;
+  --coral: #e99898;
   --blue: #68b7ff;
-  --mint: #72d9ad;
+  --mint: #98e9ab;
   --accent-ink: #111111;
   --focus: #005fcc;
   --border-width: 3px;
@@ -147,16 +181,26 @@ a:hover {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  font-family: var(--heading-font);
+  font-family: "DM Sans", var(--body-font);
   font-size: 2rem;
-  font-weight: 900;
+  font-weight: 550;
+  letter-spacing: -0.045em;
   line-height: 1;
   text-decoration: none;
-  text-transform: uppercase;
+  transition: font-weight 180ms ease-out;
 }
 
-.wordmark span {
-  color: #d62f28;
+.wordmark:hover {
+  font-weight: 650;
+}
+
+.wordmark:active {
+  font-weight: 1000;
+}
+
+.wordmark__mark {
+  color: var(--coral);
+  font-weight: 1000;
 }
 
 .site-tagline {
@@ -188,12 +232,17 @@ a:hover {
   margin: 0;
 }
 
+.footer-wordmark {
+  font-family: "DM Sans", var(--body-font);
+  font-weight: 550;
+  letter-spacing: -0.03em;
+}
+
 .site-footer a {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
   flex: 0 0 auto;
-  font-weight: 800;
 }
 
 /* Browse page */
@@ -223,9 +272,12 @@ a:hover {
 .home-intro h1 {
   width: 100%;
   margin-bottom: 0.75rem;
+  font-family: "Bricolage Grotesque", var(--heading-font);
   font-size: clamp(2.5rem, 6.5vw, 5rem);
+  font-stretch: 100%;
+  font-weight: 475;
+  font-optical-sizing: auto;
   overflow-wrap: normal;
-  text-transform: uppercase;
   word-break: normal;
 }
 
@@ -333,6 +385,11 @@ a:hover {
 
 .recipe-card h3 {
   margin-bottom: 0.75rem;
+  font-family: "Google Sans Flex", var(--heading-font);
+  font-stretch: 35%;
+  font-weight: 550;
+  font-optical-sizing: auto;
+  font-variation-settings: "GRAD" 100, "ROND" 40;
 }
 
 .favorite-badge {
@@ -439,6 +496,19 @@ a:hover {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
+}
+
+.nav-link {
+  font-family: "M PLUS U", var(--body-font);
+  font-weight: 550;
+  transition: font-weight 180ms ease-out;
+}
+
+.nav-link:hover {
+  font-weight: 750;
+}
+
+.nav-link:active {
   font-weight: 900;
 }
 
@@ -636,10 +706,6 @@ a:hover {
     --shadow: #fff8e7;
     --focus: #7cc4ff;
   }
-
-  .wordmark span {
-    color: #ff766c;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -647,7 +713,9 @@ a:hover {
     scroll-behavior: auto;
   }
 
-  .recipe-card__link {
+  .nav-link,
+  .recipe-card__link,
+  .wordmark {
     transition: none;
   }
 }

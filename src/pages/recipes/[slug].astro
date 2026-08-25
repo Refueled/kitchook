@@ -33,13 +33,13 @@ const hasOverview = hasMeta || Boolean(data.image) || hasTaxonomy;
 ---
 
 <BaseLayout
-  title={`${data.title} | Kitchook`}
+  title={`${data.title} | KitchooK!`}
   description={data.description ?? `Cook ${data.title} with Kitchook.`}
   mainClass="recipe-page"
 >
   <div class="recipe-shell">
     <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="/"><span aria-hidden="true">←</span>&nbsp; All recipes</a>
+      <a class="nav-link" href="/"><span aria-hidden="true">←</span>&nbsp; All recipes</a>
     </nav>
 
     <article>

@@ -24,7 +24,7 @@ const { title, description, mainClass } = Astro.props;
 
     <header class="site-header">
       <div class="site-header__inner">
-        <a class="wordmark" href="/" aria-label="Kitchook home">Kitchook<span aria-hidden="true">!</span></a>
+        <a class="wordmark" href="/" aria-label="KitchooK home">KitchooK<span class="wordmark__mark" aria-hidden="true">!</span></a>
         <p class="site-tagline">Cook from the source.</p>
       </div>
     </header>
@@ -35,8 +35,8 @@ const { title, description, mainClass } = Astro.props;
 
     <footer class="site-footer">
       <div class="site-footer__inner">
-        <p><strong>Kitchook</strong> — recipes kept in Markdown and served fresh.</p>
-        <a href="#main-content">Back to top</a>
+        <p><strong class="footer-wordmark">KitchooK<span class="wordmark__mark" aria-hidden="true">!</span></strong> — recipes kept in Markdown and served fresh.</p>
+        <a class="nav-link" href="#main-content">Back to top</a>
       </div>
     </footer>
   </body>

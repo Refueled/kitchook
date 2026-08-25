@@ -8,7 +8,7 @@ Phase 2's core interface is complete. Astro validates the collection, resolves a
 
 Full-text search remains deferred to Phase 3. The current homepage intentionally presents one alphabetized all-recipes grid; favorites are marked on their cards rather than duplicated into a separate section.
 
-See [PROJECT_PLAN.md](PROJECT_PLAN.md) for the architecture and implementation roadmap.
+See [PROJECT_PLAN.md](PROJECT_PLAN.md) for the architecture and implementation roadmap and [docs/BRAND.md](docs/BRAND.md) for the durable visual identity guidelines.
 
 ## Prerequisites
 
@@ -88,6 +88,7 @@ src/components/             Server-rendered recipe cards and shared metadata
 src/layouts/BaseLayout.astro Shared document shell and site chrome
 src/pages/                  Astro pages and generated recipe route
 src/styles/global.css        Responsive, dark-mode, and print presentation
+docs/BRAND.md                Visual identity and color semantics
 astro.config.mjs            Astro configuration
 tsconfig.json               Strict TypeScript configuration
 PROJECT_PLAN.md             Architecture and phased implementation roadmap
