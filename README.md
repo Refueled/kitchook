@@ -1,14 +1,24 @@
-# Kitchook
+# KitchooK!
 
-Kitchook is a self-hosted cookbook built from plain Markdown recipes. Recipe content remains the durable source of truth, while Astro produces a fully static site.
+KitchooK! is a self-hosted cookbook built from plain Markdown recipes. Recipe content remains the durable source of truth, while Astro produces a fully static site. The repository and npm package retain the lowercase identifier `kitchook`; human-facing references use the branded product name **KitchooK!**.
 
-## Status
+## Current status
 
-Phases 0–3 are complete. Astro validates the collection, resolves and optimizes colocated images, generates active recipe routes, and presents them through a responsive cooking-first interface. The site uses semantic HTML and plain CSS, follows the operating system's light or dark preference, and includes ink-conscious recipe print styles.
+**Phases 0–3 are complete.** The current site includes:
 
-Client-side MiniSearch search is available at `/search/`. It supports typo-tolerant, prefix-aware, weighted queries across recipe metadata, ingredients, and body text, plus favorite/category/tag filters. Recipe browsing and direct recipe pages continue to work without JavaScript.
+- validated top-level Markdown recipes with colocated, optimized images;
+- active-only static recipe routes and an alphabetized browse page;
+- a responsive cooking-first interface with dark mode and print styles;
+- build-generated, client-side MiniSearch search at `/search/`;
+- weighted typo-tolerant and prefix queries across metadata, ingredients, and body text;
+- favorite, category, and tag filters with shareable URL state; and
+- automated search behavior and production-artifact verification.
 
-See [PROJECT_PLAN.md](PROJECT_PLAN.md) for the architecture and implementation roadmap and [docs/BRAND.md](docs/BRAND.md) for the durable visual identity guidelines.
+Recipe browsing and direct recipe pages continue to work without JavaScript. JavaScript is limited to interactive search and the progressively enhanced mobile header search disclosure.
+
+Phase 4, the generated `/api/recipes.json` artifact, is the next roadmap phase and has not been implemented yet.
+
+See [PROJECT_PLAN.md](PROJECT_PLAN.md) for the architecture and roadmap, [PLAN_PHASE_3_SEARCH.md](PLAN_PHASE_3_SEARCH.md) for the completed Phase 3 implementation record, and [docs/BRAND.md](docs/BRAND.md) for the durable visual identity guidelines.
 
 ## Prerequisites
 
@@ -110,4 +120,5 @@ docs/BRAND.md                Visual identity and color semantics
 astro.config.mjs            Astro configuration
 tsconfig.json               Strict TypeScript configuration
 PROJECT_PLAN.md             Architecture and phased implementation roadmap
+PLAN_PHASE_3_SEARCH.md      Completed Phase 3 implementation record
 ```
