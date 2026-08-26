@@ -1,4 +1,4 @@
-# Kitchook Brand
+# KitchooK! Brand
 
 This document records the visual identity decisions that should survive individual UI revisions.
 
@@ -10,7 +10,7 @@ The full wordmark is **KitchooK!**. The capital `K` characters create a subtle v
 - On hover, smoothly increase the letter weight to 650; while pressed, increase it to 1000. This is a transient CSS interaction, not persistent state.
 - Honor reduced-motion preferences by removing the weight transition.
 - Preserve the exact capitalization `KitchooK!` in the visual mark and in page-title branding.
-- Keep the exclamation point in Kitchook coral (`#e99898`) at weight 1000 in every interaction state. Its heavier weight is part of the brand identifier.
+- Keep the exclamation point in KitchooK! coral (`#e99898`) at weight 1000 in every interaction state. Its heavier weight is part of the brand identifier.
 - Use the full wordmark in the site header when space permits.
 - The compact brand mark is **KK!** and may be used later for constrained formats such as an app icon or favicon. Do not replace the full header wordmark with it without a demonstrated space constraint.
 
@@ -24,9 +24,10 @@ Current examples include:
 
 - the wordmark exclamation point;
 - favorite or priority markers;
-- the primary recipe-title panel.
+- the primary recipe-title panel; and
+- primary search-action buttons.
 
-Important states must still include text, structure, or another non-color cue so meaning does not depend on color perception alone.
+Important states must still include text, structure, or another non-color cue so meaning does not depend on color perception alone. Do not place noninteractive coral decoration near coral controls where it could be mistaken for an action. Coral decoration should never compete with or visually imitate an interactive element.
 
 ## Supporting typography
 
@@ -35,9 +36,20 @@ Important states must still include text, structure, or another non-color cue so
 - Section `h2`: Syne Variable, weight 700.
 - Recipe-card `h3`: Google Sans Flex, optical sizing automatic, width 35%, weight 550, grade 100, and roundness 40.
 - Navigation links: M PLUS U Variable, weight 550 by default, 750 on hover, and the font's maximum weight of 900 while pressed.
+- Search-form labels: Syne Variable, weight 750.
 - Body copy and other interface text: the native system sans-serif stack.
 
 Display typography should remain direct and high-impact without creating excessive vertical space. Variable-weight interactions use the same 180 ms CSS transition and must become immediate when reduced motion is requested.
+
+## Focus and motion
+
+- Keyboard focus must remain clearly visible with a 4px focus ring and 4px offset. Use `#005fcc` in light mode and `#7cc4ff` in dark mode.
+- Composite controls should receive one coherent focus treatment. For search, the ring surrounds the complete input-and-button group rather than stopping at the input edge.
+- Focus rings fade in and out over 140 ms. This transition changes color only and must not alter layout or control dimensions.
+- Structural disclosures should animate the container's size so surrounding content moves continuously rather than jumping to its final position. The current mobile header disclosure uses a short 180 ms height transition.
+- Stable controls must remain stationary during disclosure animations. In particular, the wordmark and search-disclosure button must not shift when the mobile header grows or collapses.
+- When an animation reveals a focus target, transfer focus after the reveal finishes so the focus ring is not clipped during motion.
+- Honor `prefers-reduced-motion` by removing decorative transitions and animation delays while preserving the final state and all keyboard behavior.
 
 ## Core palette
 
