@@ -36,6 +36,7 @@ const hasOverview = hasMeta || Boolean(data.image) || hasTaxonomy;
   title={`${data.title} | KitchooK!`}
   description={data.description ?? `Cook ${data.title} with Kitchook.`}
   mainClass="recipe-page"
+  showHeaderSearch
 >
   <div class="recipe-shell">
     <nav class="breadcrumb" aria-label="Breadcrumb">

@@ -1,13 +1,15 @@
 ---
+import SearchForm from '../components/SearchForm.astro';
 import '../styles/global.css';
 
 interface Props {
   title: string;
   description: string;
   mainClass?: string;
+  showHeaderSearch?: boolean;
 }
 
-const { title, description, mainClass } = Astro.props;
+const { title, description, mainClass, showHeaderSearch = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -20,12 +22,34 @@ const { title, description, mainClass } = Astro.props;
     <title>{title}</title>
   </head>
   <body>
-    <a class="skip-link" href="#main-content">Skip to recipe content</a>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
 
     <header class="site-header">
-      <div class="site-header__inner">
+      <div class:list={["site-header__inner", { "site-header__inner--search": showHeaderSearch }]}>
         <a class="wordmark" href="/" aria-label="KitchooK home">KitchooK<span class="wordmark__mark" aria-hidden="true">!</span></a>
+
+        {showHeaderSearch && (
+          <div class="desktop-header-search">
+            <SearchForm id="desktop-header-search" variant="header" placeholder="Search recipes…" />
+          </div>
+        )}
+
         <p class="site-tagline">Cook from the source.</p>
+
+        {showHeaderSearch && (
+          <details class="mobile-header-search" data-header-search>
+            <summary>
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="24" height="24">
+                <circle cx="10.5" cy="10.5" r="6.5"></circle>
+                <path d="m15.5 15.5 5 5"></path>
+              </svg>
+              <span class="visually-hidden">Search recipes</span>
+            </summary>
+            <div class="mobile-header-search__form">
+              <SearchForm id="mobile-header-search" variant="header" placeholder="Search recipes…" />
+            </div>
+          </details>
+        )}
       </div>
     </header>
 
@@ -39,5 +63,8 @@ const { title, description, mainClass } = Astro.props;
         <a class="nav-link" href="#main-content">Back to top</a>
       </div>
     </footer>
+    <script>
+      import '../scripts/header-search';
+    </script>
   </body>
 </html>

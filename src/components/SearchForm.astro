@@ -1,0 +1,47 @@
+---
+type Variant = 'home' | 'header' | 'page';
+
+interface Props {
+  id: string;
+  variant?: Variant;
+  label?: string;
+  placeholder?: string;
+  interactive?: boolean;
+}
+
+const {
+  id,
+  variant = 'home',
+  label = 'Search recipes',
+  placeholder = 'Search titles, ingredients, tags…',
+  interactive = false,
+} = Astro.props;
+const inputId = `${id}-query`;
+---
+
+<form
+  id={id}
+  class:list={["search-form", `search-form--${variant}`]}
+  action="/search/"
+  method="get"
+  role="search"
+  data-recipe-search={interactive ? '' : undefined}
+>
+  <label class:list={["search-form__label", { "visually-hidden": variant === 'header' }]} for={inputId}>
+    {label}
+  </label>
+  <div class="search-form__row">
+    <input
+      id={inputId}
+      class="search-form__input"
+      type="search"
+      name="q"
+      placeholder={placeholder}
+      autocomplete="off"
+      enterkeyhint="search"
+      data-search-query={interactive ? '' : undefined}
+    />
+    <button class="search-form__button" type="submit">Search</button>
+  </div>
+  <slot />
+</form>

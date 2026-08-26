@@ -1,8 +1,11 @@
 # Self-Hosted Markdown Cookbook — Project Plan & Implementation Handoff
 
-> **Status:** Planning / architecture baseline  
-> **Last reviewed:** 2026-08-24  
-> **Primary audience:** Project owner + coding/automation agents  
+> **Status:** Implementation roadmap — Phases 0–3 complete
+>
+> **Last reviewed:** 2026-08-25
+>
+> **Primary audience:** Project owner + coding/automation agents
+>
 > **Purpose:** Define the architecture, content model, deployment strategy, implementation phases, and guardrails for a self-hosted cookbook whose long-term source of truth is plain Markdown in Git.
 
 ---
@@ -1291,12 +1294,15 @@ This export should be generated from the same canonical Markdown content.
 
 Keep the browser payload small.
 
+The durable visual identity is documented in [`docs/BRAND.md`](docs/BRAND.md). Phase 2 established a high-contrast neobrutalist interface, the `KitchooK!` wordmark, the coral emphasis color, and self-hosted variable display fonts; later UI work should preserve those decisions unless the brand document is deliberately revised.
+
 Use:
 
 - semantic HTML;
 - plain CSS or minimally processed CSS;
 - Astro components;
-- small purpose-built JavaScript modules.
+- self-hosted fonts with system fallbacks;
+- small purpose-built JavaScript modules only where interaction requires them.
 
 Avoid by default:
 
@@ -2230,6 +2236,8 @@ Otherwise the migration backlog can prevent the actual system from ever becoming
 
 ## Phase 0 — Repository bootstrap
 
+**Status: Complete.**
+
 Deliverables:
 
 - private GitHub repository;
@@ -2253,6 +2261,8 @@ works.
 
 ## Phase 1 — Recipe content pipeline
 
+**Status: Complete.**
+
 Deliverables:
 
 - recipe content collection;
@@ -2272,6 +2282,8 @@ Acceptance:
 ---
 
 ## Phase 2 — Core UI
+
+**Status: Complete.** The implemented brand and typography decisions are recorded in [`docs/BRAND.md`](docs/BRAND.md).
 
 Deliverables:
 
@@ -2294,16 +2306,19 @@ Acceptance:
 
 ## Phase 3 — Search
 
+**Status: Complete.** Search is a progressively enhanced `/search/` page backed by a build-generated MiniSearch index. The implemented simple-filter boundary is favorite, category, and tag; time remains result-display metadata and is deliberately deferred as a query/filter concern to a future AI/API phase.
+
 Deliverables:
 
-- recipe normalization;
-- MiniSearch build script;
-- serialized search index;
-- search page/component;
-- fuzzy search;
-- prefix search;
-- ranking;
-- simple filters.
+- shared active-recipe normalization and index options;
+- Astro static JSON endpoint at `/search/index.json`;
+- serialized MiniSearch index with compact stored fields;
+- progressively enhanced search page/component;
+- all-term typo-tolerant and prefix search;
+- metadata-aware field ranking;
+- favorite, category, and tag filters;
+- shareable URL state and history restoration;
+- generated-artifact smoke verification.
 
 Acceptance examples:
 
@@ -2320,6 +2335,8 @@ finds Chicken Tikka Masala.
 finds recipes containing that ingredient.
 
 Search should feel instantaneous with the current recipe collection.
+
+Implemented query parameters are `q`, `favorite`, repeated `category`, and repeated `tag`. Filters use AND semantics between groups and OR semantics within category/tag groups. The browser caps display at 20 results and fetches the serialized index only when a query or filter is used.
 
 ---
 
@@ -2590,17 +2607,17 @@ No database restore required.
 
 Version 1 is complete when all of the following are true:
 
-- [ ] Recipes are Markdown files under `recipes/`.
-- [ ] Recipe images can live beside recipe files.
-- [ ] Frontmatter is validated.
-- [ ] Only `title` is fundamentally required for a basic recipe.
-- [ ] Draft recipes do not publish.
-- [ ] Static pages are generated with Astro.
-- [ ] Recipe pages work well on phones and tablets.
-- [ ] Search works in the browser without a backend.
-- [ ] Search supports fuzzy matching.
-- [ ] Search supports ingredient/title/tag queries.
-- [ ] Search results are sensibly ranked.
+- [x] Recipes are Markdown files under `recipes/`.
+- [x] Recipe images can live beside recipe files.
+- [x] Frontmatter is validated.
+- [x] Only `title` is fundamentally required for a basic recipe.
+- [x] Draft recipes do not publish.
+- [x] Static pages are generated with Astro.
+- [x] Recipe pages work well on phones and tablets.
+- [x] Search works in the browser without a backend.
+- [x] Search supports fuzzy matching.
+- [x] Search supports ingredient/title/tag queries.
+- [x] Search results are sensibly ranked.
 - [ ] A generated `recipes.json` exists.
 - [ ] The production site runs through Caddy on TrueNAS.
 - [ ] Caddy only needs read access to generated site files.
@@ -2677,7 +2694,6 @@ A coding agent should **not** make the following changes without explicit approv
 
 Do not block implementation on these:
 
-- final visual branding;
 - public domain name;
 - Tailscale;
 - pantry inventory;
@@ -2708,61 +2724,14 @@ These are real implementation decisions but are not architecture blockers:
    - lightweight VM;
    - other isolated host.
 6. Preferred repository name.
-7. Visual style.
-8. Whether recipe image optimization should happen immediately.
-9. Whether categories and `meal` are redundant after real-world usage.
-10. Whether recent recipes should be determined from frontmatter or Git metadata.
+7. Whether categories and `meal` are redundant after real-world usage.
+8. Whether recent recipes should be determined from frontmatter or Git metadata.
 
 Coding agents should choose conservative defaults and document decisions rather than stalling the project for minor choices.
 
 ---
 
-# 61. Recommended First Implementation Sprint
-
-The first useful sprint should stop **before deployment automation**.
-
-Build:
-
-1. Astro project.
-2. `recipes/` directory.
-3. recipe schema.
-4. five realistic recipes.
-5. homepage.
-6. recipe page.
-7. responsive layout.
-8. MiniSearch.
-9. `recipes.json`.
-10. clean local static build.
-
-Then test it on a phone/tablet using a development or preview server.
-
-Only after the content model and kitchen UX feel right should CI/TrueNAS deployment be wired up.
-
-This avoids perfectly automating the deployment of the wrong application.
-
----
-
-# 62. First Suggested Commits
-
-A clean early Git history could look like:
-
-```text
-chore: initialize astro cookbook project
-feat: define recipe content schema
-content: add initial sample recipes
-feat: render recipe collection
-feat: add responsive recipe layout
-feat: add cookbook search
-feat: generate recipe json export
-test: validate recipe metadata
-ci: validate cookbook builds
-infra: add caddy production config
-ci: add truenas deployment workflow
-```
-
----
-
-# 63. Expected Steady-State Workflow
+# 61. Expected Steady-State Workflow
 
 Once complete, normal use should look like this:
 
@@ -2798,7 +2767,7 @@ There should be no dashboard login and no manual container update.
 
 ---
 
-# 64. Long-Term Architecture
+# 62. Long-Term Architecture
 
 The system can evolve without replacing its foundation:
 
@@ -2837,7 +2806,7 @@ That is intentional.
 
 ---
 
-# 65. Architecture Decision Summary
+# 63. Architecture Decision Summary
 
 | Concern | Decision |
 |---|---|
@@ -2867,7 +2836,7 @@ That is intentional.
 
 ---
 
-# 66. Reference Documentation
+# 64. Reference Documentation
 
 These are implementation references, not additional architecture requirements.
 
@@ -2917,7 +2886,7 @@ TrueNAS supports custom application installation through Docker Compose YAML.
 
 ---
 
-# 67. Final Project Rule
+# 65. Final Project Rule
 
 When evaluating any proposed feature or architectural change, ask:
 

@@ -1,5 +1,6 @@
 ---
 import RecipeCard from '../components/RecipeCard.astro';
+import SearchForm from '../components/SearchForm.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getPublishedRecipes } from '../lib/recipes';
 
@@ -10,10 +11,15 @@ const recipeCount = `${recipes.length} published ${recipes.length === 1 ? 'recip
 <BaseLayout
   title="KitchooK!"
   description="A fast, static cookbook of practical recipes kept in Markdown."
+  showHeaderSearch={false}
 >
   <section class="home-intro" aria-labelledby="home-title">
     <h1 id="home-title">Everything worth making</h1>
     <p>Pick a recipe, get cooking, and keep the screen clutter out of the kitchen.</p>
+  </section>
+
+  <section class="home-search" aria-label="Find a recipe">
+    <SearchForm id="home-search" variant="home" />
   </section>
 
   <section aria-labelledby="recipes-heading">

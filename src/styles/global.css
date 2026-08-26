@@ -130,9 +130,40 @@ a:hover {
   text-decoration-style: double;
 }
 
-:focus-visible {
-  outline: 4px solid var(--focus);
+button,
+input {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  margin: -1px !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+}
+
+:where(a, button, input, summary, select, textarea, [tabindex]) {
+  outline: 4px solid transparent;
   outline-offset: 4px;
+  transition: outline-color 140ms ease-out;
+}
+
+:focus-visible {
+  outline-color: var(--focus);
 }
 
 .skip-link {
@@ -177,6 +208,20 @@ a:hover {
   gap: 1rem;
 }
 
+.site-header__inner--search {
+  display: grid;
+  grid-template-columns: auto minmax(14rem, 28rem) auto;
+}
+
+.desktop-header-search {
+  width: 100%;
+  justify-self: center;
+}
+
+.mobile-header-search {
+  display: none;
+}
+
 .wordmark {
   display: inline-flex;
   align-items: center;
@@ -187,7 +232,9 @@ a:hover {
   letter-spacing: -0.045em;
   line-height: 1;
   text-decoration: none;
-  transition: font-weight 180ms ease-out;
+  transition:
+    font-weight 180ms ease-out,
+    outline-color 140ms ease-out;
 }
 
 .wordmark:hover {
@@ -207,6 +254,7 @@ a:hover {
   margin: 0;
   font-weight: 800;
   text-align: right;
+  white-space: nowrap;
 }
 
 .site-main {
@@ -245,9 +293,96 @@ a:hover {
   flex: 0 0 auto;
 }
 
+/* Search forms */
+.search-form {
+  margin: 0;
+}
+
+.search-form__label {
+  display: block;
+  margin-bottom: 1rem;
+  font-family: "Syne", "Arial Black", "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  font-weight: 750;
+  line-height: 1.1;
+}
+
+.search-form__row {
+  display: flex;
+  width: 100%;
+  margin-block: 0.5rem;
+  outline: 4px solid transparent;
+  outline-offset: 4px;
+  transition: outline-color 140ms ease-out;
+}
+
+.search-form__input {
+  width: 100%;
+  min-width: 0;
+  min-height: 3rem;
+  padding: 0.55rem 0.9rem;
+  border: var(--border-width) solid var(--border);
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 1.05rem;
+  font-weight: 700;
+  appearance: none;
+}
+
+.search-form__input::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
+@supports selector(.search-form__row:has(.search-form__input:focus-visible)) {
+  .search-form__row:has(.search-form__input:focus-visible) {
+    outline-color: var(--focus);
+  }
+
+  .search-form__input,
+  .search-form__input:focus-visible {
+    outline: 0;
+    transition: none;
+  }
+}
+
+.search-form__button {
+  min-width: 6.5rem;
+  min-height: 3rem;
+  flex: 0 0 auto;
+  padding: 0.5rem 1rem;
+  border: var(--border-width) solid var(--border);
+  border-left: 0;
+  border-radius: 0;
+  background: var(--coral);
+  color: var(--accent-ink);
+  font-weight: 900;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.search-form__button:hover {
+  background: var(--yellow);
+}
+
+.search-form--header .search-form__input,
+.search-form--header .search-form__button {
+  min-height: 44px;
+}
+
+.search-form--header .search-form__input {
+  padding-block: 0.35rem;
+  font-size: 0.95rem;
+}
+
+.search-form--header .search-form__button {
+  min-width: auto;
+  padding: 0.35rem 0.75rem;
+}
+
 /* Browse page */
 .home-intro {
-  position: relative;
   max-width: 62rem;
   margin-bottom: clamp(2.5rem, 5vw, 4rem);
   padding: clamp(1rem, 2.5vw, 2rem);
@@ -255,18 +390,6 @@ a:hover {
   background: var(--yellow);
   box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--shadow);
   color: var(--accent-ink);
-}
-
-.home-intro::after {
-  position: absolute;
-  right: clamp(1rem, 4vw, 2.5rem);
-  bottom: -1.25rem;
-  width: clamp(3rem, 10vw, 5rem);
-  height: clamp(3rem, 10vw, 5rem);
-  border: var(--border-width) solid #171717;
-  background: var(--coral);
-  content: "";
-  transform: rotate(8deg);
 }
 
 .home-intro h1 {
@@ -285,6 +408,21 @@ a:hover {
   margin-bottom: 0;
   font-size: clamp(1.05rem, 2vw, 1.25rem);
   font-weight: 750;
+}
+
+.home-search {
+  max-width: 62rem;
+  margin-bottom: clamp(3rem, 7vw, 5rem);
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: var(--border-width) solid var(--border);
+  background: var(--blue);
+  box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--shadow);
+  color: var(--accent-ink);
+}
+
+.home-search .search-form__input {
+  background: #fffdf6;
+  color: #171717;
 }
 
 .collection-heading {
@@ -327,7 +465,10 @@ a:hover {
   background: var(--surface);
   box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--shadow);
   text-decoration: none;
-  transition: box-shadow 120ms ease, transform 120ms ease;
+  transition:
+    box-shadow 120ms ease,
+    transform 120ms ease,
+    outline-color 140ms ease-out;
 }
 
 .recipe-card:nth-child(4n + 2) .recipe-card__media--fallback {
@@ -482,6 +623,182 @@ a:hover {
   font-size: clamp(1.05rem, 3vw, 1.25rem);
 }
 
+/* Search page */
+.recipe-search {
+  max-width: 58rem;
+  margin-inline: auto;
+}
+
+.search-intro {
+  margin-bottom: 2rem;
+  padding: clamp(1rem, 3vw, 1.75rem);
+  border: var(--border-width) solid var(--border);
+  background: var(--blue);
+  box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--shadow);
+  color: var(--accent-ink);
+}
+
+.search-intro h1 {
+  margin-bottom: 0.65rem;
+  font-family: "Bricolage Grotesque", var(--heading-font);
+  font-size: clamp(2.75rem, 8vw, 5rem);
+  font-weight: 475;
+}
+
+.search-intro p {
+  margin-bottom: 0;
+  font-weight: 750;
+}
+
+.search-form--page {
+  margin-bottom: 1.5rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: var(--border-width) solid var(--border);
+  background: var(--surface);
+}
+
+.search-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin: 0.625rem 0 0;
+  padding: 0.5rem 0 0;
+  border: 0;
+  border-top: 2px solid var(--border);
+}
+
+.search-filters legend {
+  width: 100%;
+  padding: 0.5rem 0 0;
+  font-weight: 900;
+}
+
+.filter-group {
+  min-width: min(100%, 12rem);
+  border: 2px solid var(--border);
+  background: var(--surface);
+}
+
+.filter-group summary {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 0.45rem 0.7rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.filter-group summary::marker {
+  font-size: 1.2em;
+}
+
+.filter-options {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.35rem;
+  border-top: 2px solid var(--border);
+}
+
+.filter-option {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0.65rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.filter-option:hover {
+  background: var(--yellow);
+  color: var(--accent-ink);
+}
+
+.filter-option input {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: 0 0 auto;
+  accent-color: var(--focus);
+}
+
+.filter-option--favorite {
+  border: 2px solid var(--border);
+  background: var(--coral);
+  color: var(--accent-ink);
+}
+
+.search-status {
+  min-height: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 900;
+}
+
+.search-status--error {
+  padding: 0.7rem;
+  border: var(--border-width) solid var(--border);
+  background: var(--coral);
+  color: var(--accent-ink);
+}
+
+.search-help,
+.search-message {
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: var(--border-width) solid var(--border);
+  background: var(--yellow);
+  color: var(--accent-ink);
+}
+
+.search-help h2 {
+  margin-bottom: 0.5rem;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+}
+
+.search-help p,
+.search-message {
+  margin-bottom: 0;
+}
+
+.search-results {
+  display: grid;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.search-result article {
+  padding: clamp(1rem, 3vw, 1.4rem);
+  border: var(--border-width) solid var(--border);
+  background: var(--surface);
+  box-shadow: 4px 4px 0 var(--shadow);
+}
+
+.search-result h2 {
+  margin-bottom: 0.65rem;
+  font-family: "Google Sans Flex", var(--heading-font);
+  font-size: clamp(1.65rem, 4vw, 2.35rem);
+  font-stretch: 35%;
+  font-weight: 550;
+  font-optical-sizing: auto;
+  font-variation-settings: "GRAD" 100, "ROND" 40;
+}
+
+.search-result__description {
+  margin-bottom: 0.75rem;
+  color: var(--muted);
+}
+
+.search-result__taxonomy {
+  margin-bottom: 0.9rem;
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.search-result__meta {
+  margin-top: 0.75rem;
+}
+
 /* Recipe detail */
 .recipe-shell {
   max-width: var(--recipe-width);
@@ -501,7 +818,9 @@ a:hover {
 .nav-link {
   font-family: "M PLUS U", var(--body-font);
   font-weight: 550;
-  transition: font-weight 180ms ease-out;
+  transition:
+    font-weight 180ms ease-out,
+    outline-color 140ms ease-out;
 }
 
 .nav-link:hover {
@@ -666,8 +985,78 @@ a:hover {
   margin-bottom: 0;
 }
 
+@media (max-width: 48rem) {
+  .site-header__inner {
+    width: min(100% - 2.5rem, var(--content-width));
+  }
+
+  .site-header__inner--search {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: 44px auto;
+    align-content: start;
+    row-gap: 0;
+    padding-block: 1rem;
+  }
+
+  .site-header__inner--search .wordmark {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .site-header__inner--search .site-tagline,
+  .desktop-header-search {
+    display: none;
+  }
+
+  .mobile-header-search {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .mobile-header-search summary {
+    position: absolute;
+    top: 1rem;
+    right: 0;
+    display: grid;
+    width: 44px;
+    height: 44px;
+    border: var(--border-width) solid var(--border);
+    background: var(--yellow);
+    color: var(--accent-ink);
+    cursor: pointer;
+    list-style: none;
+    place-items: center;
+  }
+
+  .mobile-header-search summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .mobile-header-search summary svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: square;
+    stroke-width: 2.5;
+  }
+
+  .mobile-header-search__form {
+    display: flow-root;
+    padding-block: 0.625rem 0;
+    transform: translateY(-0.35rem);
+    transition: transform 180ms ease;
+  }
+
+  .mobile-header-search[open] .mobile-header-search__form {
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 36rem) {
-  .site-header__inner,
   .site-footer__inner {
     width: min(100% - 1.25rem, var(--content-width));
   }
@@ -686,8 +1075,24 @@ a:hover {
     flex-direction: column;
   }
 
-  .home-intro::after {
-    display: none;
+  .search-form__row {
+    align-items: stretch;
+  }
+
+  .search-form:not(.search-form--header) .search-form__input,
+  .search-form:not(.search-form--header) .search-form__button {
+    min-height: 3.5rem;
+  }
+
+  .search-form__button {
+    min-width: auto;
+    padding-inline: 0.7rem;
+  }
+
+  .search-filters,
+  .filter-group,
+  .filter-option--favorite {
+    width: 100%;
   }
 
   .recipe-heading-panel,
@@ -713,9 +1118,18 @@ a:hover {
     scroll-behavior: auto;
   }
 
+  a,
+  button,
+  input,
+  summary,
+  select,
+  textarea,
+  [tabindex],
+  .search-form__row,
   .nav-link,
   .recipe-card__link,
-  .wordmark {
+  .wordmark,
+  .mobile-header-search__form {
     transition: none;
   }
 }
@@ -745,7 +1159,9 @@ a:hover {
   .site-header,
   .site-footer,
   .breadcrumb,
-  .recipe-hero {
+  .recipe-hero,
+  .home-search,
+  .recipe-search {
     display: none !important;
   }
 

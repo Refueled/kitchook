@@ -1,0 +1,19 @@
+---
+import RecipeSearch from '../components/RecipeSearch.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getPublishedRecipes } from '../lib/recipes';
+
+const recipes = await getPublishedRecipes();
+const collator = new Intl.Collator('en', { sensitivity: 'base' });
+const categories = [...new Set(recipes.flatMap(({ data }) => data.categories))].sort(collator.compare);
+const tags = [...new Set(recipes.flatMap(({ data }) => data.tags))].sort(collator.compare);
+---
+
+<BaseLayout
+  title="Search recipes | KitchooK!"
+  description="Search Kitchook recipes by title, ingredient, category, tag, and recipe text."
+  showHeaderSearch={false}
+  mainClass="search-page"
+>
+  <RecipeSearch categories={categories} tags={tags} />
+</BaseLayout>

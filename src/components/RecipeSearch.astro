@@ -1,0 +1,77 @@
+---
+import SearchForm from './SearchForm.astro';
+
+interface Props {
+  categories: string[];
+  tags: string[];
+}
+
+const { categories, tags } = Astro.props;
+---
+
+<section class="recipe-search" aria-labelledby="search-title">
+  <header class="search-intro">
+    <h1 id="search-title">Search recipes</h1>
+    <p>Search titles, aliases, tags, categories, ingredients, and recipe text.</p>
+  </header>
+
+  <SearchForm id="recipe-search" variant="page" interactive>
+    <fieldset class="search-filters">
+      <legend>Filter results</legend>
+
+      <label class="filter-option filter-option--favorite">
+        <input type="checkbox" name="favorite" value="true" data-search-favorite />
+        <span>★ Favorites only</span>
+      </label>
+
+      {categories.length > 0 && (
+        <details class="filter-group">
+          <summary>Categories</summary>
+          <div class="filter-options">
+            {categories.map((category) => (
+              <label class="filter-option">
+                <input type="checkbox" name="category" value={category} data-search-category />
+                <span>{category}</span>
+              </label>
+            ))}
+          </div>
+        </details>
+      )}
+
+      {tags.length > 0 && (
+        <details class="filter-group">
+          <summary>Tags</summary>
+          <div class="filter-options">
+            {tags.map((tag) => (
+              <label class="filter-option">
+                <input type="checkbox" name="tag" value={tag} data-search-tag />
+                <span>{tag}</span>
+              </label>
+            ))}
+          </div>
+        </details>
+      )}
+    </fieldset>
+  </SearchForm>
+
+  <p class="search-status" role="status" aria-live="polite" data-search-status>
+    Enter a search or choose a filter to find a recipe.
+  </p>
+
+  <div class="search-help" data-search-help>
+    <h2>Try a title or ingredient</h2>
+    <p>Search is typo tolerant, so close spellings work too. You can also browse favorites, categories, or tags without entering text.</p>
+  </div>
+
+  <ol class="search-results" data-search-results hidden aria-label="Recipe search results"></ol>
+
+  <noscript>
+    <p class="search-message search-message--error">
+      Interactive search requires JavaScript. You can still <a href="/">browse every published recipe</a>.
+    </p>
+  </noscript>
+</section>
+
+<script>
+  import '../scripts/search';
+</script>
