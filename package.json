@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && node --experimental-strip-types scripts/verify-search-index.ts",
-    "test": "node --experimental-strip-types --test tests/search.test.mjs",
+    "build": "astro build && node --experimental-strip-types scripts/verify-search-index.ts && node --experimental-strip-types scripts/verify-recipe-api.ts",
+    "test": "node --experimental-strip-types --test tests/search.test.mjs tests/recipe-export.test.mjs",
     "preview": "astro preview"
   },
   "engines": {

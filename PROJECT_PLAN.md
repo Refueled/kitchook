@@ -1,8 +1,8 @@
 # Self-Hosted Markdown Cookbook — Project Plan & Implementation Handoff
 
-> **Status:** Implementation roadmap — Phases 0–3 complete
+> **Status:** Current implementation roadmap — Phases 0–4 complete and verified
 >
-> **Last reviewed:** 2026-08-25
+> **Last reviewed:** 2026-08-27
 >
 > **Primary audience:** Project owner + coding/automation agents
 >
@@ -2306,7 +2306,7 @@ Acceptance:
 
 ## Phase 3 — Search
 
-**Status: Complete.** Search is a progressively enhanced `/search/` page backed by a build-generated MiniSearch index. The implemented simple-filter boundary is favorite, category, and tag; time remains result-display metadata and is deliberately deferred as a query/filter concern to a future AI/API phase.
+**Status: Complete and verified (2026-08-27).** Search is a progressively enhanced `/search/` page backed by a build-generated MiniSearch index. The implemented simple-filter boundary is favorite, category, and tag; time remains result-display metadata and is deliberately deferred as a query/filter concern to a future AI/API phase. `npm test` passes all search behavior tests, and `npm run build` generates and validates the index against every published recipe route.
 
 Deliverables:
 
@@ -2342,18 +2342,25 @@ Implemented query parameters are `q`, `favorite`, repeated `category`, and repea
 
 ## Phase 4 — Generated API artifact
 
-Deliverables:
+**Status: Complete and verified (2026-08-27).** Astro prerenders `/api/recipes.json` as a deterministic top-level array from the same alphabetized active-recipe query used by pages and search. Unit tests lock the normalization contract, and `npm run build` validates the generated artifact against every published recipe route.
 
-```text
-/api/recipes.json
-```
+Implemented contract:
+
+- every object always includes `slug`, canonical recipe `url`, `title`, and trimmed raw Markdown `body`;
+- populated taxonomy/list metadata and lightweight extracted `ingredients` remain arrays;
+- snake-case frontmatter time fields are exported as camelCase minute fields;
+- `source` contains only populated members, dates use `YYYY-MM-DD`, and images expose a root-relative generated URL plus width, height, and format;
+- `favorite` is emitted only when true, while false is the documented default;
+- `status`, nulls, empty optional containers, schema defaults, and build timestamps are omitted;
+- ingredient extraction covers every level-two heading ending in `Ingredients`, removes list markers and subsection headings, and retains unbulleted prose without claiming to be a structured ingredient parser; and
+- compatibility is additive: consumers ignore unknown fields, while existing field names, meanings, and types require an explicit contract revision to change.
 
 Acceptance:
 
-- all active recipes represented;
-- draft recipes absent;
-- valid JSON;
-- stable enough for scripts/agents.
+- all active recipes are represented in stable title/slug order;
+- draft and archived recipes are absent;
+- the artifact is valid JSON with a top-level array; and
+- API slugs exactly match generated recipe-route slugs.
 
 ---
 
@@ -2618,7 +2625,7 @@ Version 1 is complete when all of the following are true:
 - [x] Search supports fuzzy matching.
 - [x] Search supports ingredient/title/tag queries.
 - [x] Search results are sensibly ranked.
-- [ ] A generated `recipes.json` exists.
+- [x] A generated `recipes.json` exists.
 - [ ] The production site runs through Caddy on TrueNAS.
 - [ ] Caddy only needs read access to generated site files.
 - [ ] Production does not require Node.

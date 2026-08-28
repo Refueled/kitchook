@@ -1,5 +1,8 @@
 import type { Options, SearchOptions, SearchResult } from 'minisearch';
+import { compactMarkdown, extractIngredientSections } from './recipe-markdown.ts';
 import type { RecipeEntry } from './recipes';
+
+export { extractIngredientSections } from './recipe-markdown.ts';
 
 export const SEARCH_FIELDS = [
   'title',
@@ -83,25 +86,6 @@ export const recipeSearchOptions: SearchOptions = {
   fuzzy: (term) => (term.length > 3 ? 0.2 : false),
 };
 
-/** Extract every level-two Markdown section whose heading ends in "Ingredients". */
-export function extractIngredientSections(body: string): string {
-  const ingredientLines: string[] = [];
-  let inIngredientSection = false;
-
-  for (const line of body.split(/\r?\n/)) {
-    const heading = /^##\s+(.+?)\s*#*\s*$/.exec(line);
-
-    if (heading) {
-      inIngredientSection = /ingredients$/i.test(heading[1].trim());
-      continue;
-    }
-
-    if (inIngredientSection) ingredientLines.push(line);
-  }
-
-  return compactMarkdown(ingredientLines.join('\n'));
-}
-
 export function normalizeRecipe(recipe: RecipeEntry): SearchDocument {
   const { data } = recipe;
   const body = recipe.body ?? '';
@@ -140,12 +124,4 @@ export function matchesSearchFilters(
     return false;
   }
   return true;
-}
-
-function compactMarkdown(markdown: string): string {
-  return markdown
-    .replace(/<!--[^]*?-->/g, ' ')
-    .replace(/[`*_~>[\]#()-]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
 }

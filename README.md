@@ -4,21 +4,20 @@ KitchooK! is a self-hosted cookbook built from plain Markdown recipes. Recipe co
 
 ## Current status
 
-**Phases 0–3 are complete.** The current site includes:
+**Phases 0–4 are complete.** The current site includes:
 
 - validated top-level Markdown recipes with colocated, optimized images;
 - active-only static recipe routes and an alphabetized browse page;
 - a responsive cooking-first interface with dark mode and print styles;
 - build-generated, client-side MiniSearch search at `/search/`;
 - weighted typo-tolerant and prefix queries across metadata, ingredients, and body text;
-- favorite, category, and tag filters with shareable URL state; and
-- automated search behavior and production-artifact verification.
+- favorite, category, and tag filters with shareable URL state;
+- a build-generated, active-only recipe export at `/api/recipes.json`; and
+- automated search/API behavior and production-artifact verification.
 
 Recipe browsing and direct recipe pages continue to work without JavaScript. JavaScript is limited to interactive search and the progressively enhanced mobile header search disclosure.
 
-Phase 4, the generated `/api/recipes.json` artifact, is the next roadmap phase and has not been implemented yet.
-
-See [PROJECT_PLAN.md](PROJECT_PLAN.md) for the architecture and roadmap, [PLAN_PHASE_3_SEARCH.md](PLAN_PHASE_3_SEARCH.md) for the completed Phase 3 implementation record, and [docs/BRAND.md](docs/BRAND.md) for the durable visual identity guidelines.
+See [PROJECT_PLAN.md](PROJECT_PLAN.md) for the current architecture and roadmap and [docs/BRAND.md](docs/BRAND.md) for the durable visual identity guidelines.
 
 ## Prerequisites
 
@@ -37,8 +36,8 @@ npm ci --ignore-scripts
 
 ```sh
 npm run dev      # Start the local development server
-npm test         # Run normalization, search, filter, and serialization tests
-npm run build    # Build dist/ and verify the generated search artifact
+npm test         # Run search and recipe-export behavior tests
+npm run build    # Build dist/ and verify the search and recipe API artifacts
 npm run preview  # Preview the production build locally
 ```
 
@@ -100,7 +99,49 @@ Search state is shareable and restored during back/forward navigation:
 - repeated `category` — OR within selected categories
 - repeated `tag` — OR within selected tags
 
-Favorite, category, and tag groups combine with AND semantics. Time is display metadata only; time querying/filtering is deliberately deferred to a future AI/API phase.
+Favorite, category, and tag groups combine with AND semantics. Time is display metadata only; time querying/filtering is deliberately deferred to a future phase.
+
+## Recipe JSON export
+
+Astro generates `/api/recipes.json` as a static top-level array, written to `dist/api/recipes.json` during a production build. It contains every active recipe in title/slug order. Draft and archived recipes are excluded through the same publication query used for recipe pages and search.
+
+A representative object is:
+
+```json
+{
+  "slug": "chicken-tikka-masala",
+  "url": "/recipes/chicken-tikka-masala/",
+  "title": "Chicken Tikka Masala",
+  "body": "## Ingredients\n\n- ...",
+  "tags": ["chicken", "curry", "weeknight"],
+  "ingredients": ["2 lb boneless skinless chicken thighs, cut into pieces"],
+  "totalMinutes": 85,
+  "favorite": true,
+  "source": {
+    "name": "Example Recipe Source",
+    "url": "https://example.com/chicken-tikka-masala"
+  },
+  "created": "2026-03-01",
+  "image": {
+    "src": "/_astro/hero.oOJX9D3T.jpg",
+    "width": 1200,
+    "height": 1200,
+    "format": "jpg"
+  }
+}
+```
+
+Every object always has `slug`, canonical `url`, `title`, and the trimmed raw Markdown `body`. The following fields are emitted only when populated:
+
+- string arrays: `aliases`, `tags`, `categories`, `cuisine`, `meal`, and extracted `ingredients`;
+- metadata: `description`, `prepMinutes`, `cookMinutes`, `totalMinutes`, `servings`, and `difficulty`;
+- attribution and dates: populated `source` members plus date-only `created` and `updated` strings;
+- local image metadata: a site-usable root-relative `src`, original `width`, `height`, and `format`; and
+- `favorite`, only when true. Its omitted default is false.
+
+The export never includes `status`, `null`, empty arrays/objects, schema defaults, or a build timestamp. The raw Markdown body is authoritative within each exported entry. `ingredients` is intentionally lightweight: it gathers human-readable lines from every level-two heading ending in `Ingredients`, removes list markers and subsection headings, and retains unbulleted prose. It is not a structured ingredient parser.
+
+The compatibility policy is additive: consumers should ignore unknown fields. Existing field names, meanings, and types will not be removed or changed without an explicit contract revision. The top-level value remains an array rather than a version envelope.
 
 ## Repository layout
 
@@ -108,17 +149,18 @@ Favorite, category, and tag groups combine with AND semantics. Time is display m
 recipes/                    Canonical, framework-independent recipe content
 src/content.config.ts       Recipe loader and validation schema
 src/lib/recipes.ts          Active-recipe publication query
+src/lib/recipe-markdown.ts  Shared ingredient-section Markdown helpers
+src/lib/recipe-export.ts    Stable machine-readable recipe contract
 src/lib/search.ts           Shared normalization and MiniSearch contract
 src/components/             Server-rendered recipe and search UI shells
 src/scripts/                Plain TypeScript browser interactions
 src/layouts/BaseLayout.astro Shared document shell and site chrome
-src/pages/                  Astro pages, recipe routes, and search endpoint
+src/pages/                  Astro pages, recipe routes, and JSON endpoints
 scripts/                     Production artifact verification
-tests/                       Node built-in search tests
+tests/                       Node built-in search and export tests
 src/styles/global.css        Responsive, dark-mode, and print presentation
 docs/BRAND.md                Visual identity and color semantics
 astro.config.mjs            Astro configuration
 tsconfig.json               Strict TypeScript configuration
 PROJECT_PLAN.md             Architecture and phased implementation roadmap
-PLAN_PHASE_3_SEARCH.md      Completed Phase 3 implementation record
 ```
