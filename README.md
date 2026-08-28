@@ -4,7 +4,7 @@ KitchooK! is a self-hosted cookbook built from plain Markdown recipes. Recipe co
 
 ## Current status
 
-**Phases 0–4 are complete.** The current site includes:
+**Phases 0–5 are complete.** The current site includes:
 
 - validated top-level Markdown recipes with colocated, optimized images;
 - active-only static recipe routes and an alphabetized browse page;
@@ -12,8 +12,9 @@ KitchooK! is a self-hosted cookbook built from plain Markdown recipes. Recipe co
 - build-generated, client-side MiniSearch search at `/search/`;
 - weighted typo-tolerant and prefix queries across metadata, ingredients, and body text;
 - favorite, category, and tag filters with shareable URL state;
-- a build-generated, active-only recipe export at `/api/recipes.json`; and
-- automated search/API behavior and production-artifact verification.
+- a build-generated, active-only recipe export at `/api/recipes.json`;
+- automated search/API behavior and production-artifact verification; and
+- GitHub Actions validation for pull requests targeting `main` and pushes to `main`.
 
 Recipe browsing and direct recipe pages continue to work without JavaScript. JavaScript is limited to interactive search and the progressively enhanced mobile header search disclosure.
 
@@ -40,6 +41,12 @@ npm test         # Run search and recipe-export behavior tests
 npm run build    # Build dist/ and verify the search and recipe API artifacts
 npm run preview  # Preview the production build locally
 ```
+
+## Continuous integration
+
+The GitHub Actions CI workflow runs for pull requests targeting `main` and pushes to `main`. It installs the exact `package-lock.json` dependency graph without lifecycle scripts, runs the tests, builds the production site, and requires `dist/index.html` to exist. Invalid recipe metadata, missing referenced images, blank active recipe bodies, and inconsistent generated search/API artifacts therefore fail before deployment.
+
+Successful pushes to `main` upload one artifact named `site` with 14-day retention. Its extraction root is the contents of `dist/`, so `index.html`, `search/index.json`, `api/recipes.json`, recipe pages, and static assets are directly available without a nested `dist/` directory. Pull requests validate the same build but do not upload an artifact. This is the static-site handoff contract consumed by the Phase 7 deployment workflow.
 
 ## Authoring recipes
 

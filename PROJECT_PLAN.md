@@ -1,6 +1,6 @@
 # Self-Hosted Markdown Cookbook — Project Plan & Implementation Handoff
 
-> **Status:** Current implementation roadmap — Phases 0–4 complete and verified
+> **Status:** Current implementation roadmap — Phases 0–5 complete and verified
 >
 > **Last reviewed:** 2026-08-27
 >
@@ -2366,6 +2366,15 @@ Acceptance:
 
 ## Phase 5 — CI
 
+**Status: Complete and verified (2026-08-27).** A unified, least-privilege GitHub Actions workflow validates pull requests targeting `main` and pushes to `main` on a GitHub-hosted Ubuntu runner with Node 24 from `.nvmrc`. It performs a clean `npm ci --ignore-scripts`, runs the existing tests and production build, and explicitly requires `dist/index.html`.
+
+Implemented artifact contract:
+
+- only successful pushes to `main` upload an artifact; pull requests perform the same validation without uploading;
+- the artifact is named `site`, retains for 14 days, and fails upload if `dist/` is missing;
+- the contents of `dist/` are the artifact root, so extraction places `index.html`, recipe routes, `/search/index.json`, and `/api/recipes.json` directly at the deployable root; and
+- official actions are commit-SHA pinned, checkout credentials are not persisted, npm caches downloads keyed by `package-lock.json`, token access is read-only, and superseded same-PR/branch runs are cancelled.
+
 Deliverables:
 
 - pull-request validation workflow;
@@ -2630,8 +2639,8 @@ Version 1 is complete when all of the following are true:
 - [ ] Caddy only needs read access to generated site files.
 - [ ] Production does not require Node.
 - [ ] Production does not require a database.
-- [ ] CI validates every push/PR.
-- [ ] Merge to `main` builds the static artifact.
+- [x] CI validates every pull request targeting `main` and every push to `main`.
+- [x] Merge to `main` builds the static artifact.
 - [ ] Successful `main` builds automatically deploy.
 - [ ] Deployment does not require logging into the TrueNAS UI.
 - [ ] Deployments are versioned by Git SHA.
