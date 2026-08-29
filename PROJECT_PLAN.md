@@ -1,8 +1,8 @@
 # Self-Hosted Markdown Cookbook — Project Plan & Implementation Handoff
 
-> **Status:** Current implementation roadmap — Phases 0–5 complete and verified
+> **Status:** Current implementation roadmap — Phases 0–6 complete
 >
-> **Last reviewed:** 2026-08-27
+> **Last reviewed:** 2026-08-28
 >
 > **Primary audience:** Project owner + coding/automation agents
 >
@@ -1638,91 +1638,45 @@ Version 1 can simply document the command.
 
 # 29. TrueNAS Dataset Layout
 
-Illustrative layout:
+Phase 6 implements this Host Path layout:
 
 ```text
-/mnt/tank/apps/cookbook/
+/mnt/<pool>/apps/kitchook/
 ├── site/
 │   ├── releases/
-│   └── current
-│
-├── config/
-│   └── Caddyfile
-│
-└── runner/
-    └── data/
+│   │   └── <commit-sha>/
+│   └── current -> releases/<commit-sha>
+└── config/
+    └── Caddyfile
 ```
 
-Adapt pool/dataset names to the actual TrueNAS configuration.
-
-Permissions should separate:
-
-- Caddy: read-only site access;
-- deploy runner: write only to cookbook deployment area;
-- no service should need broad access to unrelated NAS datasets.
+The exact pool/dataset path is selected during live setup. It must be a dedicated dataset outside hidden `ix-apps` management and must not also be an SMB/NFS share. Caddy user `568:568` receives read/traverse access to config and site; the publisher receives modify access only to `site/`. The future Phase 7 runner remains a separate security boundary and needs no broad NAS access.
 
 ---
 
 # 30. Caddy Configuration
 
-Minimal concept:
+The implemented [`infrastructure/Caddyfile`](infrastructure/Caddyfile) is explicitly HTTP-only on `:8080`, disables the admin API, persisted dynamic configuration, and automatic HTTPS, and serves `/srv/current` with the ordinary static file server. It enables zstd/gzip, emits access logs to stdout, returns real 404s, and does not enable directory browsing or an SPA fallback.
 
-```caddyfile
-:80 {
-    root * /srv/current
+All responses receive conservative security headers. Ordinary HTML, JSON, fonts, and other non-hashed paths use `Cache-Control: no-cache` so clients revalidate; only `/_astro/*` receives `public, max-age=31536000, immutable`. HSTS is intentionally absent because the Phase 6 origin is LAN HTTP.
 
-    encode zstd gzip
-
-    file_server
-}
-```
-
-Possible future configuration:
-
-```caddyfile
-recipes.example.internal {
-    root * /srv/current
-    encode zstd gzip
-    file_server
-}
-```
-
-If another reverse proxy already manages TLS/domain routing, keep Caddy internal and let the existing proxy handle public-facing TLS.
-
-Do not unnecessarily expose the cookbook directly to the public internet.
+The live origin remains HTTP-only; remote TLS and authentication terminate at Cloudflare. A self-hosted Cloudflare Access application restricts the hostname to approved identities, and anonymous requests redirect to Access login rather than origin content.
 
 ---
 
-# 31. Docker Compose Concept
+# 31. Docker Compose / TrueNAS Custom App
 
-Illustrative production service:
+The implemented [`infrastructure/compose.yml`](infrastructure/compose.yml) is installed through TrueNAS 25.04 **Install via YAML** after replacing the dataset path and selected host port. It uses the digest-pinned Caddy 2.11.4 Alpine image, bridge-publishes one operator-selected host port to container port 8080, and bind-mounts only `<dataset>/site` and `<dataset>/config/Caddyfile`, both read-only.
 
-```yaml
-services:
-  cookbook:
-    image: caddy:2-alpine
-    restart: unless-stopped
+Security/runtime properties:
 
-    ports:
-      - "8080:80"
+- numeric non-root `568:568`, every capability dropped, no-new-privileges, and read-only root filesystem;
+- bounded `/data` and `/config` tmpfs mounts rather than image-declared anonymous volumes;
+- bounded health check, CPU, memory, PIDs, shutdown grace, and container logs;
+- no Docker socket, privileged mode, host networking, source/recipe mount, secret, or unrelated NAS path; and
+- restart behavior and container replacement are independent from release files.
 
-    volumes:
-      - /mnt/tank/apps/cookbook/site:/srv:ro
-      - /mnt/tank/apps/cookbook/config/Caddyfile:/etc/caddy/Caddyfile:ro
-
-    security_opt:
-      - no-new-privileges:true
-```
-
-The exact TrueNAS deployment YAML may differ based on local networking and existing reverse-proxy conventions.
-
-Key properties:
-
-- static site bind mount is read-only;
-- no Docker socket;
-- no privileged container;
-- no recipe editing inside container;
-- container replacement is unrelated to recipe publication.
+The startup copy of the Caddy executable into `/config` tmpfs is deliberate: it strips the official binary's unused low-port file capability so the binary can execute with a zeroed capability bounding set while the service listens on 8080.
 
 ---
 
@@ -1973,21 +1927,17 @@ Generated site releases do not require long-term backup because they can be rege
 
 ## Local access
 
-Use local DNS if available:
+Phase 6 uses the owner's chosen stable LAN IP-and-port contract:
 
 ```text
-cookbook.home.arpa
+http://<truenas-ip>:<published-host-port>
 ```
 
-or another existing internal domain.
-
-`home.arpa` is preferable to inventing fake public DNS suffixes when the local DNS environment supports it.
+Caddy listens on unprivileged port 8080 inside its bridge-network container. TrueNAS publishes one operator-selected host port. This is ordinary port publishing, not host networking, and does not conflict with a TrueNAS dashboard using host port 8080. Local DNS is not required; LAN clients use `http://<truenas-ip>:<host-port>`.
 
 ## Remote access
 
-If remote access becomes useful for grocery shopping or travel, prefer a private overlay network such as Tailscale rather than directly exposing the cookbook publicly.
-
-The site itself does not require authentication if network access already provides the trust boundary.
+A Cloudflare Tunnel routes an authenticated hostname to `http://<truenas-ip>:<host-port>`. Cloudflare's identity provider and a self-hosted Access application restrict access to approved identities. Anonymous requests were verified to receive an Access-login redirect before and after binding the origin. No router port-forward exists. TLS, WAF rules, and an unguessable hostname are not access control, so the Access policy must remain fail-closed.
 
 ---
 
@@ -2391,19 +2341,39 @@ Acceptance:
 
 ## Phase 6 — TrueNAS serving
 
-Deliverables:
+**Status: Complete (2026-08-29).** Repository-owned infrastructure is implemented in [`infrastructure/`](infrastructure/). TrueNAS host lifecycle, persistence, permission-boundary, HTTP, Cloudflare Access, iOS/iPadOS kitchen use, and desktop-browser checks all passed.
 
-- TrueNAS dataset;
-- Caddy config;
-- Docker Compose/Custom App;
-- read-only static mount;
-- local DNS entry.
+Implemented contract:
 
-Acceptance:
+- a dedicated Host Path dataset uses `config/Caddyfile`, `site/releases/<commit-sha>`, and a relative `site/current` symlink; Caddy mounts the parent `site/` path read-only so an atomic switch is visible without a restart;
+- Caddy serves HTTP only on container port 8080 with no SPA fallback or directory browsing, zstd/gzip compression, conservative security headers, `no-cache` revalidation for ordinary files, and one-year immutable caching only under `/_astro/`;
+- the Docker Official Image is pinned as `caddy:2.11.4-alpine@sha256:5f5c8640aae01df9654968d946d8f1a56c497f1dd5c5cda4cf95ab7c14d58648` (verified AMD64 child `sha256:98eb57d882ccd5213d1688764db10c1ca2c58a1ca3a6717a3411ad798f7a423a`);
+- Compose runs numeric non-root user `568:568`, uses a read-only root and bind mounts, drops every Linux capability, enables no-new-privileges, bounds CPU/memory/PIDs/logs, and creates only bounded tmpfs runtime mounts;
+- because the official binary carries `cap_net_bind_service` and Linux refuses to execute it after that capability is removed from the bounding set, startup copies it to `/config` tmpfs (stripping the file capability) before execution; this preserves both the exact pinned image and an actually capability-free Caddy process;
+- bridge networking maps one selected TrueNAS host port to container TCP 8080; LAN clients use `http://<truenas-ip>:<host-port>` and local DNS is not required;
+- `publish-release.sh` validates required artifact files, rejects artifact symlinks and unsafe IDs, cleans failed staging, refuses duplicate releases, makes completed releases read-only, atomically replaces `current`, and never prunes; and
+- the operator runbook covers dataset/ACL setup, artifact transfer, YAML installation, LAN testing, authenticated Cloudflare access, restart/replacement, rollback, and write denial.
 
-- site accessible from kitchen devices;
-- Caddy survives restart;
-- static files persist independently of container.
+Repository verification completed:
+
+- current tests and production build passed, including generated search/API artifact checks;
+- publisher edge cases passed for valid/missing artifacts, duplicate IDs, spaces in paths, symlink/unsafe input, failed staging cleanup, first publication, and two-release switching;
+- temporary Compose rendering confirmed exactly two read-only host binds, bounded tmpfs mounts, no anonymous volume, and the intended security/resource settings;
+- `caddy validate` and `caddy adapt --validate` passed under the exact pinned multi-platform digest while forcing the target AMD64 image;
+- a local Compose smoke test passed for `/`, a recipe, search/API JSON, real 404 behavior, HTTP without TLS redirect, gzip/zstd, content types, cache/security headers, denied `/srv` writes, zero effective/bounding capabilities, live atomic release switching, and restart survival.
+
+Live acceptance completed on 2026-08-29:
+
+- TrueNAS Community Edition 25.04.2.6 on x86_64 serves the dedicated Host Path dataset through the selected LAN port;
+- an initial dataset-path substitution targeted the boot environment rather than the intended storage pool; files were checksum-verified into the dedicated dataset, ACLs were tightened, the template placeholder was clarified, and the app was updated through TrueNAS middleware;
+- Caddy `568:568` can read the selected release but cannot write `/srv`; a password-disabled, non-login publisher identity can modify only `site/`, not `config/` or the parent apps dataset;
+- a distinguishable acceptance release was published and served without a Caddy restart, after which `current` was atomically restored to the desired release;
+- TrueNAS stop/start and separate redeploys returned healthy, preserved the relative selection and file hashes, and served the same HTTP surface from new containers;
+- before deletion, the obsolete boot-environment copy was confirmed unmounted, unreferenced, and byte-identical to the corresponding live release/configuration, then removed with a one-filesystem-bounded command; the live dataset hashes and HTTP service remained unchanged;
+- representative phone, tablet/kitchen-device, and desktop-browser rendering passed; no router port-forward exists; and
+- after account-restricted Cloudflare Access was configured, anonymous requests to the remote hostname were verified to redirect to the Cloudflare Access login.
+
+Final owner acceptance confirmed that authenticated login reaches the cookbook and representative household devices render it correctly.
 
 ---
 
@@ -2635,10 +2605,10 @@ Version 1 is complete when all of the following are true:
 - [x] Search supports ingredient/title/tag queries.
 - [x] Search results are sensibly ranked.
 - [x] A generated `recipes.json` exists.
-- [ ] The production site runs through Caddy on TrueNAS.
-- [ ] Caddy only needs read access to generated site files.
-- [ ] Production does not require Node.
-- [ ] Production does not require a database.
+- [x] The production site runs through Caddy on TrueNAS.
+- [x] Caddy only needs read access to generated site files.
+- [x] Production does not require Node.
+- [x] Production does not require a database.
 - [x] CI validates every pull request targeting `main` and every push to `main`.
 - [x] Merge to `main` builds the static artifact.
 - [ ] Successful `main` builds automatically deploy.
@@ -2731,17 +2701,17 @@ The architecture already leaves room for them.
 
 These are real implementation decisions but are not architecture blockers:
 
-1. Exact TrueNAS dataset path.
-2. Existing reverse proxy, if any.
-3. Local DNS system.
-4. Whether the Caddy container should expose port 80 directly or sit behind another proxy.
-5. Exact self-hosted runner packaging:
+1. Exact TrueNAS dataset path: resolved operationally and intentionally omitted from public documentation.
+2. Final published host port: resolved operationally and intentionally omitted from public documentation.
+3. Exact self-hosted runner packaging:
    - dedicated container;
    - lightweight VM;
    - other isolated host.
-6. Preferred repository name.
-7. Whether categories and `meal` are redundant after real-world usage.
-8. Whether recent recipes should be determined from frontmatter or Git metadata.
+4. Preferred repository name.
+5. Whether categories and `meal` are redundant after real-world usage.
+6. Whether recent recipes should be determined from frontmatter or Git metadata.
+
+Resolved for Phase 6: LAN access uses a stable TrueNAS IP plus an operator-selected published port; local DNS is not required; Caddy listens on container port 8080 on the ordinary bridge network; and remote access uses an account-restricted Cloudflare Access application with no router port-forward.
 
 Coding agents should choose conservative defaults and document decisions rather than stalling the project for minor choices.
 

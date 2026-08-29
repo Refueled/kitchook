@@ -1,0 +1,69 @@
+services:
+  kitchook:
+    # Docker Official Image. The readable tag and immutable multi-platform digest
+    # were re-verified together before this file was committed.
+    image: caddy:2.11.4-alpine@sha256:5f5c8640aae01df9654968d946d8f1a56c497f1dd5c5cda4cf95ab7c14d58648
+    restart: unless-stopped
+    user: "568:568"
+    read_only: true
+
+    # The official binary carries cap_net_bind_service for ports 80/443. Linux
+    # refuses to exec that file after its capability is removed from the
+    # container bounding set, even though this service only uses port 8080.
+    # Copying it to tmpfs strips the file capability and permits a truly
+    # capability-free process without building a derivative image.
+    entrypoint:
+      - /bin/sh
+      - -eu
+      - -c
+      - |
+        cp /usr/bin/caddy /config/caddy-unprivileged
+        exec /config/caddy-unprivileged run --config /etc/caddy/Caddyfile --adapter caddyfile
+
+    ports:
+      - target: 8080
+        published: "15000" # REPLACE with one unused TrueNAS host port.
+        protocol: tcp
+
+    volumes:
+      - type: bind
+        source: /mnt/POOL/apps/kitchook/site # REPLACE /mnt/POOL/apps/kitchook with the dedicated dataset path.
+        target: /srv
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: /mnt/POOL/apps/kitchook/config/Caddyfile # Make the same dataset-path replacement here.
+        target: /etc/caddy/Caddyfile
+        read_only: true
+        bind:
+          create_host_path: false
+
+    # The official image declares /data and /config. Keep those runtime paths
+    # ephemeral rather than allowing Docker to create anonymous volumes.
+    tmpfs:
+      - /data:rw,nosuid,nodev,noexec,size=16m,mode=0700,uid=568,gid=568
+      - /config:rw,nosuid,nodev,exec,size=64m,mode=0700,uid=568,gid=568
+
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "--timeout=3", "http://127.0.0.1:8080/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+    cpus: "0.50"
+    mem_limit: 128m
+    pids_limit: 100
+    stop_grace_period: 10s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

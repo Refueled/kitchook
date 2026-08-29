@@ -4,7 +4,7 @@ KitchooK! is a self-hosted cookbook built from plain Markdown recipes. Recipe co
 
 ## Current status
 
-**Phases 0–5 are complete.** The current site includes:
+**Phases 0–6 are complete.** The current site includes:
 
 - validated top-level Markdown recipes with colocated, optimized images;
 - active-only static recipe routes and an alphabetized browse page;
@@ -14,7 +14,8 @@ KitchooK! is a self-hosted cookbook built from plain Markdown recipes. Recipe co
 - favorite, category, and tag filters with shareable URL state;
 - a build-generated, active-only recipe export at `/api/recipes.json`;
 - automated search/API behavior and production-artifact verification; and
-- GitHub Actions validation for pull requests targeting `main` and pushes to `main`.
+- GitHub Actions validation for pull requests targeting `main` and pushes to `main`; and
+- a locally validated, hardened Caddy/TrueNAS static-serving package with manual atomic releases.
 
 Recipe browsing and direct recipe pages continue to work without JavaScript. JavaScript is limited to interactive search and the progressively enhanced mobile header search disclosure.
 
@@ -47,6 +48,20 @@ npm run preview  # Preview the production build locally
 The GitHub Actions CI workflow runs for pull requests targeting `main` and pushes to `main`. It installs the exact `package-lock.json` dependency graph without lifecycle scripts, runs the tests, builds the production site, and requires `dist/index.html` to exist. Invalid recipe metadata, missing referenced images, blank active recipe bodies, and inconsistent generated search/API artifacts therefore fail before deployment.
 
 Successful pushes to `main` upload one artifact named `site` with 14-day retention. Its extraction root is the contents of `dist/`, so `index.html`, `search/index.json`, `api/recipes.json`, recipe pages, and static assets are directly available without a nested `dist/` directory. Pull requests validate the same build but do not upload an artifact. This is the static-site handoff contract consumed by the Phase 7 deployment workflow.
+
+## TrueNAS static serving
+
+[`infrastructure/README.md`](infrastructure/README.md) is the Phase 6 operator runbook. The repository owns:
+
+- an HTTP-only Caddy configuration serving `/srv/current`, with revalidation for ordinary files and one-year immutable caching only for `/_astro/*`;
+- a digest-pinned, non-root Compose template with read-only Host Path mounts, zero Linux capabilities, no privilege escalation, a read-only root filesystem, a health check, and bounded resources; and
+- `infrastructure/publish-release.sh`, which validates a deployable artifact, creates a read-only release, and atomically switches a relative `current` symlink without pruning older releases.
+
+The live layout is `<dataset>/site/releases/<release-id>` plus a relative `site/current`, with Caddy mounting the parent `site/` path read-only. TrueNAS bridge networking publishes a selected host port to container port 8080, so LAN clients use `http://<truenas-ip>:<host-port>` without requiring local DNS.
+
+TrueNAS 25.04.2.6 serves the desired release from a dedicated Host Path dataset. Live acceptance passed for the hardened container settings, Caddy write denial, dedicated publisher scope and atomic switch/rollback, app stop/start, container-replacement persistence, authenticated Cloudflare access, phone/tablet rendering, the intended kitchen tablet, and a desktop browser.
+
+Remote access uses Cloudflare Tunnel with a self-hosted Access application restricted to approved identities; anonymous requests were verified to redirect to Cloudflare Access rather than exposing origin content. There is no router port-forward. Any future hostname must receive equivalent fail-closed authentication—bot, scraper, or AI blocking and TLS are not authentication.
 
 ## Authoring recipes
 
@@ -165,6 +180,7 @@ src/layouts/BaseLayout.astro Shared document shell and site chrome
 src/pages/                  Astro pages, recipe routes, and JSON endpoints
 scripts/                     Production artifact verification
 tests/                       Node built-in search and export tests
+infrastructure/              TrueNAS/Caddy config, publisher, and runbook
 src/styles/global.css        Responsive, dark-mode, and print presentation
 docs/BRAND.md                Visual identity and color semantics
 astro.config.mjs            Astro configuration
