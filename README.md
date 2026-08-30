@@ -4,7 +4,7 @@ KitchooK! is a self-hosted cookbook built from plain Markdown recipes. Recipe co
 
 ## Current status
 
-**Phases 0–6 are complete.** The current site includes:
+**Phases 0–6 are complete. Phase 7 repository automation is implemented; TrueNAS runner provisioning and live end-to-end acceptance are pending.** The current site includes:
 
 - validated top-level Markdown recipes with colocated, optimized images;
 - active-only static recipe routes and an alphabetized browse page;
@@ -14,8 +14,9 @@ KitchooK! is a self-hosted cookbook built from plain Markdown recipes. Recipe co
 - favorite, category, and tag filters with shareable URL state;
 - a build-generated, active-only recipe export at `/api/recipes.json`;
 - automated search/API behavior and production-artifact verification; and
-- GitHub Actions validation for pull requests targeting `main` and pushes to `main`; and
-- a locally validated, hardened Caddy/TrueNAS static-serving package with manual atomic releases.
+- GitHub Actions validation for pull requests targeting `main` and pushes to `main`;
+- a locally validated, hardened Caddy/TrueNAS static-serving package; and
+- a repository-scoped runner package for same-run artifact deployment, verified rollback, and five-release managed retention.
 
 Recipe browsing and direct recipe pages continue to work without JavaScript. JavaScript is limited to interactive search and the progressively enhanced mobile header search disclosure.
 
@@ -38,7 +39,7 @@ npm ci --ignore-scripts
 
 ```sh
 npm run dev      # Start the local development server
-npm test         # Run search and recipe-export behavior tests
+npm test         # Run search, recipe-export, and deployment behavior/structure tests
 npm run build    # Build dist/ and verify the search and recipe API artifacts
 npm run preview  # Preview the production build locally
 ```
@@ -47,7 +48,9 @@ npm run preview  # Preview the production build locally
 
 The GitHub Actions CI workflow runs for pull requests targeting `main` and pushes to `main`. It installs the exact `package-lock.json` dependency graph without lifecycle scripts, runs the tests, builds the production site, and requires `dist/index.html` to exist. Invalid recipe metadata, missing referenced images, blank active recipe bodies, and inconsistent generated search/API artifacts therefore fail before deployment.
 
-Successful pushes to `main` upload one artifact named `site` with 14-day retention. Its extraction root is the contents of `dist/`, so `index.html`, `search/index.json`, `api/recipes.json`, recipe pages, and static assets are directly available without a nested `dist/` directory. Pull requests validate the same build but do not upload an artifact. This is the static-site handoff contract consumed by the Phase 7 deployment workflow.
+Successful pushes to `main` upload one artifact named `site` with 14-day retention. Its extraction root is the contents of `dist/`, so `index.html`, `search/index.json`, `api/recipes.json`, recipe pages, and static assets are directly available without a nested `dist/` directory. Pull requests validate the same build but do not upload an artifact.
+
+After validation, a push-only deploy job targets the repository-scoped `[self-hosted, kitchook-deploy]` runner. It serializes production, skips a completed build if its SHA is no longer the `main` head, downloads the same-run artifact with a commit-pinned official action, and invokes read-only installed operations without checking out source or rebuilding on TrueNAS. The runner package and provisioning/rollback/recovery runbook are in [`infrastructure/runner/`](infrastructure/runner/).
 
 ## TrueNAS static serving
 
@@ -55,11 +58,12 @@ Successful pushes to `main` upload one artifact named `site` with 14-day retenti
 
 - an HTTP-only Caddy configuration serving `/srv/current`, with revalidation for ordinary files and one-year immutable caching only for `/_astro/*`;
 - a digest-pinned, non-root Compose template with read-only Host Path mounts, zero Linux capabilities, no privilege escalation, a read-only root filesystem, a health check, and bounded resources; and
-- `infrastructure/publish-release.sh`, which validates a deployable artifact, creates a read-only release, and atomically switches a relative `current` symlink without pruning older releases.
+- release helpers that validate artifacts, create read-only automation-managed releases, safely retry only byte-identical releases, atomically switch/roll back `current`, verify the LAN origin, and prune only explicitly managed history; and
+- a version-and-digest-pinned official GitHub runner template with a read-only root/operations mount, ephemeral workspace, no port or Docker socket, and write access only to runner state plus `site/`.
 
 The live layout is `<dataset>/site/releases/<release-id>` plus a relative `site/current`, with Caddy mounting the parent `site/` path read-only. TrueNAS bridge networking publishes a selected host port to container port 8080, so LAN clients use `http://<truenas-ip>:<host-port>` without requiring local DNS.
 
-TrueNAS 25.04.2.6 serves the desired release from a dedicated Host Path dataset. Live acceptance passed for the hardened container settings, Caddy write denial, dedicated publisher scope and atomic switch/rollback, app stop/start, container-replacement persistence, authenticated Cloudflare access, phone/tablet rendering, the intended kitchen tablet, and a desktop browser.
+TrueNAS 25.04.2.6 serves the desired release from a dedicated Host Path dataset. Phase 6 live acceptance passed for the hardened container settings, Caddy write denial, dedicated publisher scope and atomic switch/rollback, app stop/start, container-replacement persistence, authenticated Cloudflare access, phone/tablet rendering, the intended kitchen tablet, and a desktop browser. Phase 7's repository checks pass, but the separate runner still must be provisioned and accepted on that host before unattended deployment is called live.
 
 Remote access uses Cloudflare Tunnel with a self-hosted Access application restricted to approved identities; anonymous requests were verified to redirect to Cloudflare Access rather than exposing origin content. There is no router port-forward. Any future hostname must receive equivalent fail-closed authentication—bot, scraper, or AI blocking and TLS are not authentication.
 
@@ -179,8 +183,8 @@ src/scripts/                Plain TypeScript browser interactions
 src/layouts/BaseLayout.astro Shared document shell and site chrome
 src/pages/                  Astro pages, recipe routes, and JSON endpoints
 scripts/                     Production artifact verification
-tests/                       Node built-in search and export tests
-infrastructure/              TrueNAS/Caddy config, publisher, and runbook
+tests/                       Node built-in search, export, and deployment tests
+infrastructure/              TrueNAS/Caddy config, deployment helpers, runner package, and runbooks
 src/styles/global.css        Responsive, dark-mode, and print presentation
 docs/BRAND.md                Visual identity and color semantics
 astro.config.mjs            Astro configuration

@@ -1,8 +1,8 @@
-# TrueNAS static serving
+# TrueNAS static serving and automated deployment
 
-> **Status:** Phase 6 complete. TrueNAS host, lifecycle, persistence, permission, authenticated-edge, kitchen-device, and desktop-browser acceptance passed.
+> **Status:** Phase 6 serving acceptance passed. Phase 7 repository automation is implemented; dedicated-runner provisioning and live end-to-end acceptance remain operator tasks.
 
-This package serves KitchooK! as static files on TrueNAS Community Edition 25.04.2.6. Caddy runs as numeric non-root user `568:568`, listens on HTTP port 8080 inside a bridge-network container, and sees the generated site and its own configuration through read-only bind mounts. TrueNAS publishes one operator-selected host port.
+This package serves KitchooK! as static files on TrueNAS Community Edition 25.04.2.6 and publishes successful `main` builds through a separate, repository-scoped runner app. Caddy runs as numeric non-root user `568:568`, listens on HTTP port 8080 inside a bridge-network container, and sees the generated site and its own configuration through read-only bind mounts. TrueNAS publishes one operator-selected host port. The deployment runner is isolated from Caddy and receives write access only to `site/` plus its own state.
 
 Default installation is LAN-only. The live deployment additionally uses a Cloudflare Tunnel and a self-hosted Cloudflare Access application restricted to the owner's identity. Never create a public route without tested, fail-closed authentication, and never create a router port-forward.
 
@@ -10,7 +10,12 @@ Default installation is LAN-only. The live deployment additionally uses a Cloudf
 
 - [`Caddyfile`](Caddyfile) serves `/srv/current` with no SPA fallback and no directory listing.
 - [`compose.yml`](compose.yml) is the TrueNAS **Install via YAML** template.
-- [`publish-release.sh`](publish-release.sh) manually stages and selects immutable releases.
+- [`publish-release.sh`](publish-release.sh) stages, records, and selects immutable managed releases with safe matching retries.
+- [`select-release.sh`](select-release.sh) performs validated atomic rollback/selection.
+- [`adopt-release.sh`](adopt-release.sh) explicitly enrolls a known-good pre-automation release.
+- [`prune-releases.sh`](prune-releases.sh) retains only the configured number of explicitly managed releases.
+- [`deploy-release.sh`](deploy-release.sh) publishes, verifies the direct LAN origin byte-for-byte, restores the prior selection on failure, and then prunes.
+- [`runner/`](runner/) contains the hardened, reusable TrueNAS Custom App runner package and its complete provisioning runbook.
 - The image is the Docker Official Image `caddy:2.11.4-alpine`, pinned to multi-platform digest `sha256:5f5c8640aae01df9654968d946d8f1a56c497f1dd5c5cda4cf95ab7c14d58648`. Docker Hub reported AMD64 child digest `sha256:98eb57d882ccd5213d1688764db10c1ca2c58a1ca3a6717a3411ad798f7a423a` when this package was implemented. Re-check both before a future intentional image update.
 
 The host layout is:
@@ -20,6 +25,10 @@ The host layout is:
 ├── config/
 │   └── Caddyfile
 └── site/
+    ├── .kitchook-deploy/
+    │   ├── releases             ordered managed-release records
+    │   ├── pending/             interrupted-publication ownership markers
+    │   └── pruning/             interrupted-retention markers
     ├── releases/
     │   ├── <commit-sha>/
     │   └── <older-commit-sha>/
@@ -86,7 +95,7 @@ Do not create `current` as a directory. The publisher creates it as a relative s
 
 ## 2. Configure identities and permissions
 
-For the initial manual test, an administrator can copy and publish files. Caddy runs as `UID:GID 568:568`; it needs read/traverse access only. The future Phase 7 publisher will be a distinct identity with modify access only to `site/`.
+For the initial manual test, an administrator can copy and publish files. Caddy runs as `UID:GID 568:568`; it needs read/traverse access only. The Phase 7 runner uses the official image's `UID:GID 1001:1001`, with Modify access only to `site/` and its separate runner-state path; follow the [runner runbook](runner/README.md) rather than granting access to `config/` or the parent dataset.
 
 After copying the Caddyfile and publishing the first release, open **Datasets → apps → kitchook → Permissions → Edit ACL**:
 
@@ -194,11 +203,13 @@ The final command must print `releases/<full-commit-sha>`, with no leading slash
 - rejects unsafe release IDs and artifacts containing symlinks;
 - copies through a same-filesystem staging directory;
 - makes completed release content read-only;
-- refuses to replace an existing release ID;
-- atomically replaces `current` with a relative symlink; and
-- never prunes an older release.
+- records automation ownership/order outside immutable release content;
+- never replaces an existing release ID;
+- accepts a retry only when an existing managed release matches the artifact byte-for-byte;
+- recovers an exact pending managed publication after an interrupted selection; and
+- atomically replaces `current` with a relative symlink.
 
-A failure before release completion removes the hidden staging directory. A failure while selecting `current` can leave a valid completed release in `releases/`; that is safe and should be diagnosed rather than overwritten.
+A failure before release completion removes its staging directory while retaining an exact pending ownership marker for safe retry. An unmanaged collision, mismatched retry, stale fixed staging path, or malformed selection fails closed. Pruning is a separate post-verification operation and never touches unmanaged directories.
 
 ## 4. Choose the LAN host port
 
@@ -289,33 +300,37 @@ Finally:
 
 Until all live checks pass, describe the precise pending checks rather than marking Phase 6 complete.
 
-## Release switch and rollback
+## Automated deployment, release switch, and rollback
 
-Publish a different build with a different commit SHA using the helper. Caddy follows the new relative `current` symlink without a restart.
+Provision the dedicated runner using [`runner/README.md`](runner/README.md). The unified workflow builds once on GitHub-hosted Ubuntu, then only for a successful, still-current `main` push downloads the same-run artifact on `[self-hosted, kitchook-deploy]`. The runner does not check out source, build, or install npm dependencies.
 
-To roll back to an already published release, first validate the target and then atomically switch the symlink as the publisher:
+`deploy-release.sh` publishes under the full commit SHA, confirms the relative selection, compares the LAN origin homepage/search/API bytes with the selected release using cache-busting requests, and restores and verifies the previous selection if the new content fails. Only after success does it retain five managed releases. A cleanup warning does not roll back an otherwise healthy deployment.
+
+To roll back without rebuilding or restarting Caddy, run as the scoped publisher identity:
 
 ```sh
 SITE="$DATASET/site"
 OLD=<existing-release-id>
-test -s "$SITE/releases/$OLD/index.html"
-test -s "$SITE/releases/$OLD/search/index.json"
-test -s "$SITE/releases/$OLD/api/recipes.json"
-NEXT="$SITE/.current.rollback.$$"
-trap 'rm -f "$NEXT"' EXIT HUP INT TERM
-ln -s "releases/$OLD" "$NEXT"
-mv -Tf "$NEXT" "$SITE/current"
-trap - EXIT HUP INT TERM
+sh /path/to/select-release.sh "$OLD" "$SITE"
+readlink "$SITE/current"
 ```
 
-Confirm with `readlink "$SITE/current"` and a browser refresh. Do not edit a completed release in place. Phase 6 does not prune releases; retention automation belongs to Phase 7.
+For migration, enroll the selected known-good Phase 6 baseline without selecting or modifying it:
+
+```sh
+sh /path/to/adopt-release.sh <baseline-release-id> "$SITE"
+```
+
+Confirm rollback through the direct LAN origin and a browser. Do not edit a completed release in place. Unknown/unmanaged release directories are never pruned automatically.
 
 ## Recovery notes
 
 - **App is unhealthy immediately after install:** confirm `current` exists, is a relative symlink, and all parent paths are traversable/readable by UID 568.
 - **Caddyfile change prevents startup:** compare the dataset copy with the repository file, validate it with the pinned image, restore the known-good copy, and restart the app.
 - **Port collision:** choose another unused host port, update only `published`, and redeploy the YAML. Keep target 8080.
-- **Bad release:** use the rollback procedure. Do not delete the currently selected release.
+- **Bad release:** unattended verification restores the previous selection when possible; otherwise use `select-release.sh`. Do not delete the currently selected release.
+- **Runner job remains queued:** verify the separate runner app is online with the repository-scoped `kitchook-deploy` label; GitHub will not fall back to another runner.
+- **Stale deployment control path:** confirm no job is active, then inspect `.kitchook-deploy/` markers and hidden staging paths using the runner recovery guide. Do not blindly remove ownership/order records.
 - **Container/app lost:** recreate it from the rendered YAML. The Host Path dataset, releases, and selection remain independent.
 - **Dataset cannot be created or mounted:** stop and diagnose dataset/ACL/host-path validation. Do not fall back to ixVolume without revisiting the architecture.
 

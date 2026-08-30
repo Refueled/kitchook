@@ -11,9 +11,11 @@ on:
 permissions:
   contents: read
 
+# Superseded pull-request validation is disposable. Main pushes use a unique
+# group so a newer push cannot cancel a build whose artifact may still deploy.
 concurrency:
-  group: ci-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || format('push-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   validate:
@@ -54,3 +56,66 @@ jobs:
           path: dist/
           if-no-files-found: error
           retention-days: 14
+
+  deploy:
+    name: Deploy production
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: validate
+    runs-on:
+      - self-hosted
+      - kitchook-deploy
+    timeout-minutes: 15
+
+    # Production jobs never cancel one another. The stale-head check runs only
+    # after this serialized job acquires the dedicated runner.
+    concurrency:
+      group: kitchook-production
+      cancel-in-progress: false
+
+    steps:
+      - name: Confirm this commit is still the main head
+        id: freshness
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_SHA: ${{ github.sha }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          head_sha=$(
+            curl --fail --silent --show-error --location \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/$REPOSITORY/git/ref/heads/main" |
+              jq -er '.object.sha'
+          )
+          if [[ "$head_sha" == "$EXPECTED_SHA" ]]; then
+            echo "deploy=true" >>"$GITHUB_OUTPUT"
+          else
+            echo "deploy=false" >>"$GITHUB_OUTPUT"
+            echo "Skipping stale build $EXPECTED_SHA; main is now $head_sha"
+          fi
+
+      - name: Download the same-run site artifact
+        if: steps.freshness.outputs.deploy == 'true'
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: site
+          path: ${{ runner.temp }}/site
+          digest-mismatch: error
+
+      - name: Publish and verify immutable release
+        if: steps.freshness.outputs.deploy == 'true'
+        shell: bash
+        env:
+          RELEASE_ID: ${{ github.sha }}
+          ARTIFACT_ROOT: ${{ runner.temp }}/site
+        run: |
+          set -euo pipefail
+          : "${KITCHOOK_SITE_ROOT:?runner must configure KITCHOOK_SITE_ROOT}"
+          : "${KITCHOOK_ORIGIN_URL:?runner must configure KITCHOOK_ORIGIN_URL}"
+          : "${KITCHOOK_RETAIN_RELEASES:?runner must configure KITCHOOK_RETAIN_RELEASES}"
+          /opt/kitchook/deploy-release.sh \
+            "$ARTIFACT_ROOT" "$RELEASE_ID" "$KITCHOOK_SITE_ROOT" \
+            "$KITCHOOK_ORIGIN_URL" "$KITCHOOK_RETAIN_RELEASES"

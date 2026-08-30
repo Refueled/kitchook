@@ -9,107 +9,88 @@ usage() {
     exit 64
 }
 
-fail() {
-    echo "publish-release: $*" >&2
-    exit 1
-}
-
 [ "$#" -eq 3 ] || usage
 
+PROGRAM=publish-release
+SCRIPT_DIR=$(CDPATH= cd "$(dirname "$0")" && pwd)
+# shellcheck source=release-lib.sh
+. "$SCRIPT_DIR/release-lib.sh"
+
 source_dir=${1%/}
-release_id=$2
-site_root=${3%/}
-
 [ -n "$source_dir" ] || source_dir=/
-[ -n "$site_root" ] || site_root=/
-[ -d "$source_dir" ] || fail "artifact root is not a directory: $source_dir"
-
-case "$release_id" in
-    ""|.|..|*[!A-Za-z0-9._-]*)
-        fail "release ID must use only letters, numbers, dots, underscores, and hyphens"
-        ;;
-    [A-Za-z0-9]*) ;;
-    *) fail "release ID must begin with a letter or number" ;;
-esac
-
-[ "${#release_id}" -le 128 ] || fail "release ID must be 128 characters or fewer"
-
-for required_file in index.html search/index.json api/recipes.json; do
-    [ -f "$source_dir/$required_file" ] ||
-        fail "artifact is missing required file: $required_file"
-    [ -s "$source_dir/$required_file" ] ||
-        fail "required artifact file is empty: $required_file"
-done
-
-if find "$source_dir" -type l -print -quit | grep -q .; then
-    fail "artifact must not contain symbolic links"
-fi
-
-if [ -L "$site_root" ]; then
-    fail "site root must be a real directory, not a symbolic link: $site_root"
-fi
-
-umask 022
-mkdir -p "$site_root"
-releases_dir=$site_root/releases
-
-if [ -L "$releases_dir" ]; then
-    fail "releases path must be a real directory, not a symbolic link: $releases_dir"
-fi
-mkdir -p "$releases_dir"
-[ -d "$releases_dir" ] || fail "releases path is not a directory: $releases_dir"
+release_id=$2
+validate_release_id "$release_id"
+validate_artifact_root "$source_dir" artifact
+prepare_site_root "$3"
+ensure_management
 
 release_dir=$releases_dir/$release_id
-if [ -e "$release_dir" ] || [ -L "$release_dir" ]; then
-    fail "release already exists and will not be replaced: $release_id"
-fi
-
-current_link=$site_root/current
-if { [ -e "$current_link" ] || [ -L "$current_link" ]; } && [ ! -L "$current_link" ]; then
-    fail "current exists but is not a symbolic link: $current_link"
-fi
-
-stage_dir=$releases_dir/.${release_id}.staging.$$
-next_link=$site_root/.current.staging.$$
+pending_marker=$pending_dir/$release_id
+stage_dir=$releases_dir/.${release_id}.staging
+stage_created=false
 
 cleanup() {
-    if [ -n "${stage_dir:-}" ] && [ -e "$stage_dir" ]; then
+    if [ "${stage_created:-false}" = true ] && [ -n "${stage_dir:-}" ] &&
+        { [ -e "$stage_dir" ] || [ -L "$stage_dir" ]; }; then
         chmod -R u+w "$stage_dir" 2>/dev/null || true
         rm -rf "$stage_dir"
-    fi
-    if [ -n "${next_link:-}" ] && [ -L "$next_link" ]; then
-        rm -f "$next_link"
     fi
 }
 trap cleanup EXIT HUP INT TERM
 
+if [ -e "$release_dir" ] || [ -L "$release_dir" ]; then
+    validate_release_dir "$release_id"
+    if ! diff -qr "$source_dir" "$release_dir" >/dev/null 2>&1; then
+        fail "existing release does not match the supplied artifact: $release_id"
+    fi
+
+    if is_managed_release "$release_id"; then
+        if [ -e "$pending_marker" ] || [ -L "$pending_marker" ]; then
+            write_control_marker "$pending_marker" "$release_id"
+            rm -f "$pending_marker"
+        fi
+        atomic_select_release "$release_id"
+        printf 'Release %s already exists, matches, and is managed; selection recovered\n' "$release_id"
+        printf 'Current selection: %s -> %s\n' "$current_link" "$(readlink "$current_link")"
+        exit 0
+    fi
+
+    if [ -e "$pending_marker" ] || [ -L "$pending_marker" ]; then
+        write_control_marker "$pending_marker" "$release_id"
+        record_managed_release "$release_id"
+        rm -f "$pending_marker"
+        atomic_select_release "$release_id"
+        printf 'Recovered interrupted publication of release %s\n' "$release_id"
+        printf 'Current selection: %s -> %s\n' "$current_link" "$(readlink "$current_link")"
+        exit 0
+    fi
+
+    fail "release already exists but is not owned by this automation: $release_id"
+fi
+
+if is_managed_release "$release_id"; then
+    fail "managed-release history references a missing release: $release_id"
+fi
+
+write_control_marker "$pending_marker" "$release_id"
+
 [ ! -e "$stage_dir" ] && [ ! -L "$stage_dir" ] ||
-    fail "temporary staging path already exists: $stage_dir"
+    fail "stale staging path requires operator review: $stage_dir"
 mkdir "$stage_dir"
+stage_created=true
 cp -R "$source_dir"/. "$stage_dir"/
+validate_artifact_root "$stage_dir" "staged release"
 
-for required_file in index.html search/index.json api/recipes.json; do
-    [ -s "$stage_dir/$required_file" ] ||
-        fail "staged release failed validation: $required_file"
-done
-
-# Static content is readable by Caddy. Completed releases are read-only and
-# are never replaced by this helper.
+# Completed release content is readable by Caddy, immutable in place, and only
+# removable as a whole by the retention helper.
 chmod -R a+rX,a-w "$stage_dir"
-# No destination exists here; a plain rename keeps the helper usable on both
-# TrueNAS (GNU coreutils) and maintainer workstations.
 mv "$stage_dir" "$release_dir"
+stage_created=false
 stage_dir=
 
-ln -s "releases/$release_id" "$next_link"
-if mv --help 2>&1 | grep -q -- '--no-target-directory'; then
-    mv -Tf "$next_link" "$current_link"
-else
-    # BSD mv uses -h for the same important behavior: replace a destination
-    # symlink itself rather than following a symlink that points to a directory.
-    mv -fh "$next_link" "$current_link"
-fi
-next_link=
+record_managed_release "$release_id"
+rm -f "$pending_marker"
+atomic_select_release "$release_id"
 
-printf 'Published release %s\n' "$release_id"
+printf 'Published managed release %s\n' "$release_id"
 printf 'Current selection: %s -> %s\n' "$current_link" "$(readlink "$current_link")"

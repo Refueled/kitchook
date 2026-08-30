@@ -1547,37 +1547,28 @@ Advantages:
 
 # 26. Deployment Stage — Self-Hosted Runner
 
-After a successful build of `main`:
+Phase 7 implements deployment as a dependent job in the existing unified workflow. Only a successful push-to-`main` build schedules `[self-hosted, kitchook-deploy]`; pull requests never target local infrastructure. The job waits in a non-canceling production concurrency group, queries GitHub's read-only refs API after acquiring the runner, and exits successfully without deployment if its SHA is no longer the `main` head.
+
+A commit-SHA-pinned `actions/download-artifact` downloads the same run's named `site` artifact into ephemeral runner storage. The deployment job does not check out source, rebuild, or install dependencies. Repository-owned helpers installed read-only on the host then:
 
 ```text
-download dist artifact
-verify expected files
-create release directory
-copy artifact
-update current symlink
-delete old releases beyond retention count
+validate artifact and full-SHA release ID
+publish or safely recover the matching immutable managed release
+atomically select current
+compare homepage, search JSON, and recipe API bytes through the LAN origin
+restore and verify the prior selection on failure
+prune only explicitly managed history after success
 ```
 
-Example production layout:
-
-```text
-/mnt/tank/apps/cookbook/site/
-├── releases/
-│   ├── a91d1c2/
-│   ├── bd193ca/
-│   └── c813ef0/
-└── current -> releases/c813ef0
-```
-
-Use the Git commit SHA as the release identifier.
+Production remains `site/releases/<full-commit-sha>` plus a relative `current` symlink. Release ownership/order and interrupted-operation markers live under `site/.kitchook-deploy/`, outside immutable content. A matching managed retry is accepted; unmanaged, partial without an ownership marker, or byte-mismatched collisions fail closed.
 
 Benefits:
 
-- deploy is effectively atomic;
-- rollback is trivial;
-- no Caddy restart;
-- no Docker image rebuild;
-- production state maps directly to a Git revision.
+- deploy is effectively atomic and stale builds cannot roll production backward;
+- rollback is immediate and uses the same validated selector;
+- no Caddy restart or image rebuild occurs;
+- production state maps directly to a full Git revision; and
+- retention never guesses whether an unknown directory belongs to automation.
 
 ---
 
@@ -1650,7 +1641,7 @@ Phase 6 implements this Host Path layout:
     └── Caddyfile
 ```
 
-The exact pool/dataset path is selected during live setup. It must be a dedicated dataset outside hidden `ix-apps` management and must not also be an SMB/NFS share. Caddy user `568:568` receives read/traverse access to config and site; the publisher receives modify access only to `site/`. The future Phase 7 runner remains a separate security boundary and needs no broad NAS access.
+The exact pool/dataset path is selected during live setup. It must be a dedicated dataset outside hidden `ix-apps` management and must not also be an SMB/NFS share. Caddy user `568:568` receives read/traverse access to config and site. The Phase 7 runner is a separate app using official-image UID/GID `1001:1001`; it receives Modify only on `site/` and a separate runner-state Host Path, plus Read on a root-owned operations Host Path. It cannot mount or write Caddy configuration, the parent apps dataset, or unrelated NAS paths. The selected Phase 6 baseline is explicitly adopted into `.kitchook-deploy/releases`; unmanaged acceptance/test directories are classified and removed manually after migration acceptance.
 
 ---
 
@@ -1677,6 +1668,8 @@ Security/runtime properties:
 - restart behavior and container replacement are independent from release files.
 
 The startup copy of the Caddy executable into `/config` tmpfs is deliberate: it strips the official binary's unused low-port file capability so the binary can execute with a zeroed capability bounding set while the service listens on 8080.
+
+Phase 7 adds a **separate** TrueNAS Custom App from [`infrastructure/runner/compose.yml`](infrastructure/runner/compose.yml). It wraps GitHub's version-and-digest-pinned public official runner image without building a project image or publishing a registry artifact. The app exposes no port and mounts only persistent runner state, read-only operations, and writable `site/`; `_work` and `/tmp` are bounded tmpfs.
 
 ---
 
@@ -1707,6 +1700,8 @@ For this project:
 12. Consider GitHub environment protections if additional collaborators are later added.
 
 For a single-owner private repository, the risk is manageable, but the runner should still be treated as a code-execution boundary.
+
+The implemented boundary uses a repository registration token only on first startup. The entrypoint unsets it before starting `Runner.Listener`, and the operator must remove it from the TrueNAS app definition immediately after registration. Persistent state permits GitHub's default automatic runner updates without a runtime PAT; downloaded actions, artifacts, and workspaces are discarded with tmpfs. The container runs numeric `1001:1001` with a read-only root, all capabilities dropped, no-new-privileges, no supplementary sudo/docker groups, no Docker socket, no inbound port, and no source mount. The official image's bundled `sudo` and Docker CLI therefore provide no elevation or host daemon access.
 
 ---
 
@@ -2351,7 +2346,7 @@ Implemented contract:
 - Compose runs numeric non-root user `568:568`, uses a read-only root and bind mounts, drops every Linux capability, enables no-new-privileges, bounds CPU/memory/PIDs/logs, and creates only bounded tmpfs runtime mounts;
 - because the official binary carries `cap_net_bind_service` and Linux refuses to execute it after that capability is removed from the bounding set, startup copies it to `/config` tmpfs (stripping the file capability) before execution; this preserves both the exact pinned image and an actually capability-free Caddy process;
 - bridge networking maps one selected TrueNAS host port to container TCP 8080; LAN clients use `http://<truenas-ip>:<host-port>` and local DNS is not required;
-- `publish-release.sh` validates required artifact files, rejects artifact symlinks and unsafe IDs, cleans failed staging, refuses duplicate releases, makes completed releases read-only, atomically replaces `current`, and never prunes; and
+- the Phase 6 publisher originally validated required files, rejected artifact symlinks/unsafe IDs, cleaned failed staging, refused duplicate releases, made content read-only, and atomically replaced `current`; Phase 7 preserves those safety properties while adding external ownership metadata and exact managed retries; and
 - the operator runbook covers dataset/ACL setup, artifact transfer, YAML installation, LAN testing, authenticated Cloudflare access, restart/replacement, rollback, and write denial.
 
 Repository verification completed:
@@ -2379,22 +2374,43 @@ Final owner acceptance confirmed that authenticated login reaches the cookbook a
 
 ## Phase 7 — Automated deployment
 
-Deliverables:
+**Status: Repository implementation complete and locally verified (2026-08-29); live runner provisioning and end-to-end host acceptance pending.** Do not call unattended production complete until the operator finishes the live checklist in [`infrastructure/runner/README.md`](infrastructure/runner/README.md).
 
-- repository-scoped self-hosted runner;
-- tightly scoped filesystem access;
-- deploy workflow;
-- versioned releases;
-- atomic `current` switch;
-- old-release retention.
+Implemented contract:
 
-Acceptance:
+- the existing GitHub-hosted `validate` job still builds exactly once; only successful `main` pushes upload `site` and schedule the dependent deploy job;
+- pull requests never target the self-hosted label, PR cancellation remains enabled, main builds are not canceled, production deploys serialize without cancellation, and a refs-API check skips stale completed builds;
+- the deploy job uses `actions/download-artifact` v8.0.1 pinned to commit `3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c`, downloads the same-run artifact, and invokes installed operations without checkout, npm, Node builds, SSH, or Docker;
+- publishing validates required files and rejects artifact symlinks, stages on the destination filesystem, makes content read-only, records ownership/order externally, accepts only byte-identical managed retries, and recovers exact pending transactions without overwriting a release;
+- selection is a shared validated atomic relative-symlink operation used by publication and manual/automatic rollback;
+- deployment captures the prior selection, verifies homepage, search index, and recipe API bytes through cache-busted direct-LAN requests, restores and verifies the prior release after failure, and skips retention on failed verification;
+- retention keeps five managed releases total, protects `current` and the new release, records interrupted pruning, and ignores unmanaged directories; cleanup failure is visible but does not roll back a verified deployment;
+- a known-good Phase 6 baseline can be explicitly adopted without modifying content or selection and counts toward retention; obsolete unmanaged Phase 6 acceptance releases require owner-confirmed manual removal;
+- the reusable TrueNAS runner package pins official `ghcr.io/actions/actions-runner:2.337.0` to OCI index digest `sha256:e5496277be5d09bc968b3d64911b74e219ac4a3f2edce956a3ecf9271bea1ef4` (verified AMD64 child `sha256:5036480998280bb21e32ade9fe1b02b493861ac314b62ba1aea320b94f56ec97`);
+- the runner app uses UID/GID 1001, persistent auto-updating runner-only state, read-only operations/root, bounded tmpfs work/temp, zero capabilities, no-new-privileges, no port, and only a `site/` writable application mount; and
+- the one-hour setup token is unset before listener startup and must be removed from app configuration after first registration. No runtime PAT, Cloudflare credential, Docker socket, source mount, or broad NAS credential is used.
+
+Repository acceptance completed:
+
+- existing tests and production build pass;
+- deployment tests cover valid publication, malformed artifacts and IDs, unmanaged collisions, explicit adoption, matching/mismatched retries, atomic selection, a six-release retention case, unmanaged preservation, and simulated origin-verification rollback;
+- structural checks lock push/dependency/label/concurrency/stale-SHA/action-pin/no-checkout properties and the runner's mounts/tmpfs/hardening; and
+- shell syntax and rendered Compose structure pass local validation.
+
+Live acceptance still required:
+
+- provision the repository-scoped runner and equivalent UID 1001 ACLs on TrueNAS;
+- adopt the selected Phase 6 baseline, remove the setup token, and prove write denial outside state plus `site/`;
+- merge/push a distinguishable `main` change and verify matching full-SHA publication through LAN and authenticated remote paths without Caddy restart;
+- test retry, rollback, discarded workspace, and five-release retention; then explicitly remove obsolete Phase 6 test releases and revoke the old publisher ACL if no longer required.
+
+Final acceptance remains:
 
 ```text
 merge to main
 ```
 
-results in the new production site with no manual TrueNAS interaction.
+results in the matching new production site with no manual TrueNAS interaction.
 
 ---
 
@@ -2451,7 +2467,7 @@ jobs:
 
     runs-on:
       - self-hosted
-      - cookbook-deploy
+      - kitchook-deploy
 
     steps:
       - download dist artifact
@@ -2703,10 +2719,7 @@ These are real implementation decisions but are not architecture blockers:
 
 1. Exact TrueNAS dataset path: resolved operationally and intentionally omitted from public documentation.
 2. Final published host port: resolved operationally and intentionally omitted from public documentation.
-3. Exact self-hosted runner packaging:
-   - dedicated container;
-   - lightweight VM;
-   - other isolated host.
+3. Exact self-hosted runner packaging: resolved in Phase 7 as a separate hardened TrueNAS Custom App around GitHub's public official runner image, with persistent runner-only state and ephemeral job workspace.
 4. Preferred repository name.
 5. Whether categories and `meal` are redundant after real-world usage.
 6. Whether recent recipes should be determined from frontmatter or Git metadata.
