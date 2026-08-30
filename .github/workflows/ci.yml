@@ -43,6 +43,8 @@ jobs:
         run: npm test
 
       - name: Build production site
+        env:
+          PUBLIC_DEPLOYMENT_ID: ${{ github.sha }}
         run: npm run build
 
       - name: Verify deployable site entry point

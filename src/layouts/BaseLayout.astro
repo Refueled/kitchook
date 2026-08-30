@@ -10,6 +10,7 @@ interface Props {
 }
 
 const { title, description, mainClass, showHeaderSearch = false } = Astro.props;
+const deploymentId = import.meta.env.PUBLIC_DEPLOYMENT_ID || 'local-build';
 ---
 
 <!doctype html>
@@ -59,12 +60,29 @@ const { title, description, mainClass, showHeaderSearch = false } = Astro.props;
 
     <footer class="site-footer">
       <div class="site-footer__inner">
-        <p><strong class="footer-wordmark">KitchooK<span class="wordmark__mark" aria-hidden="true">!</span></strong> — recipes kept in Markdown and served fresh.</p>
+        <p>
+          <button
+            class="footer-wordmark footer-deployment"
+            type="button"
+            data-deployment-copy
+            data-deployment-id={deploymentId}
+            aria-describedby="deployment-tooltip"
+            aria-label={`KitchooK! deployment ${deploymentId}. Copy deployment identifier.`}
+          >
+            KitchooK<span class="wordmark__mark" aria-hidden="true">!</span>
+            <span class="footer-deployment__tooltip" id="deployment-tooltip" role="tooltip" data-deployment-tooltip>
+              Deployment {deploymentId} — click to copy
+            </span>
+          </button>
+          — recipes kept in Markdown and served fresh.
+          <span class="visually-hidden" aria-live="polite" data-deployment-status></span>
+        </p>
         <a class="nav-link" href="#main-content">Back to top</a>
       </div>
     </footer>
     <script>
       import '../scripts/header-search';
+      import '../scripts/deployment-copy';
     </script>
   </body>
 </html>

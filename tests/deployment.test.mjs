@@ -281,3 +281,16 @@ test('workflow and runner template preserve the deployment trust boundary', asyn
   assert.match(entrypoint, /find "\$IMAGE_RUNNER_ROOT" -mindepth 1 -maxdepth 1/);
   assert.match(entrypoint, /-exec cp -a --no-preserve=ownership,timestamps/);
 });
+
+test('footer exposes and copies the build deployment identifier', async () => {
+  const workflow = await readFile(path.join(repositoryRoot, '.github', 'workflows', 'ci.yml'), 'utf8');
+  const layout = await readFile(path.join(repositoryRoot, 'src', 'layouts', 'BaseLayout.astro'), 'utf8');
+  const copyScript = await readFile(path.join(repositoryRoot, 'src', 'scripts', 'deployment-copy.ts'), 'utf8');
+
+  assert.match(workflow, /PUBLIC_DEPLOYMENT_ID: \$\{\{ github\.sha \}\}/);
+  assert.match(layout, /import\.meta\.env\.PUBLIC_DEPLOYMENT_ID \|\| 'local-build'/);
+  assert.match(layout, /data-deployment-copy/);
+  assert.match(layout, /aria-live="polite"/);
+  assert.match(copyScript, /navigator\.clipboard\?\.writeText/);
+  assert.match(copyScript, /document\.execCommand\('copy'\)/);
+});
