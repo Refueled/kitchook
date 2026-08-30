@@ -1,6 +1,6 @@
 # TrueNAS static serving and automated deployment
 
-> **Status:** Phase 6 serving acceptance passed. Phase 7 repository automation is implemented; dedicated-runner provisioning and live end-to-end acceptance remain operator tasks.
+> **Status:** Phase 6 serving and Phase 7 dedicated-runner deployment passed live acceptance on TrueNAS 25.04.2.6.
 
 This package serves KitchooK! as static files on TrueNAS Community Edition 25.04.2.6 and publishes successful `main` builds through a separate, repository-scoped runner app. Caddy runs as numeric non-root user `568:568`, listens on HTTP port 8080 inside a bridge-network container, and sees the generated site and its own configuration through read-only bind mounts. TrueNAS publishes one operator-selected host port. The deployment runner is isolated from Caddy and receives write access only to `site/` plus its own state.
 

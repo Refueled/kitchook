@@ -2374,7 +2374,7 @@ Final owner acceptance confirmed that authenticated login reaches the cookbook a
 
 ## Phase 7 — Automated deployment
 
-**Status: Repository implementation complete and locally verified (2026-08-29); live runner provisioning and end-to-end host acceptance pending.** Do not call unattended production complete until the operator finishes the live checklist in [`infrastructure/runner/README.md`](infrastructure/runner/README.md).
+**Status: Complete and live-verified on TrueNAS 25.04.2.6 (2026-08-30).** The repository-scoped runner, unattended full-SHA publication, authenticated delivery, safe retry, cleanup hook, and migration cleanup passed acceptance.
 
 Implemented contract:
 
@@ -2397,20 +2397,19 @@ Repository acceptance completed:
 - structural checks lock push/dependency/label/concurrency/stale-SHA/action-pin/no-checkout properties and the runner's mounts/tmpfs/hardening; and
 - shell syntax and rendered Compose structure pass local validation.
 
-Live acceptance still required:
+Live acceptance completed:
 
-- provision the repository-scoped runner and equivalent UID 1001 ACLs on TrueNAS;
-- adopt the selected Phase 6 baseline, remove the setup token, and prove write denial outside state plus `site/`;
-- merge/push a distinguishable `main` change and verify matching full-SHA publication through LAN and authenticated remote paths without Caddy restart;
-- test retry, rollback, discarded workspace, and five-release retention; then explicitly remove obsolete Phase 6 test releases and revoke the old publisher ACL if no longer required.
+- a separate repository-scoped runner registered with the `kitchook-deploy` label and remained online after its one-hour setup token was removed from both app configuration and the listener environment;
+- UID 1001 can modify only runner state and `site/`; operations are root-owned/read-only, Caddy config and parent datasets reject writes, the root filesystem is read-only, capabilities are dropped, and no port, privileged mode, source mount, or Docker socket exists;
+- the selected Phase 6 commit was explicitly adopted without changing `current` or any of its 73 files;
+- workflow run `33322073263` built and uploaded `site` on GitHub-hosted infrastructure, then deployed full SHA `883b6a1d7a8ed6b0997f042eebaf3737d6269c70` on only the dedicated runner;
+- distinguishable deployment `cefe1db7bd620de46dacc9ae9568a1d5655eca8d` embedded its full SHA in the footer, matched artifact digest `sha256:45890458d48c3fe646600151bbf314e9be31ef3f10070eb2b96e9e437625bfbc`, and served byte-identical homepage/search/API content through the cache-busted LAN origin;
+- owner-authenticated Cloudflare Access served that identifier and its click-to-copy behavior, while Caddy retained the same running container;
+- a same-run retry accepted the existing release only as byte-identical and managed, retained one history record, reverified the origin, and cleared actions/artifacts/workspace data while preserving runner registration and diagnostics;
+- live production was not disturbed solely to manufacture an origin failure or six releases; automated tests cover verified rollback and six-release/five-retained behavior, including unmanaged preservation; and
+- the obsolete unmanaged Phase 6 acceptance directory was explicitly removed, the old publisher UID 3004 ACL was revoked, and the adopted baseline remains managed to age out naturally.
 
-Final acceptance remains:
-
-```text
-merge to main
-```
-
-results in the matching new production site with no manual TrueNAS interaction.
+Final acceptance passed: a push to `main` produced the matching production site without manual TrueNAS publication or a Caddy restart.
 
 ---
 

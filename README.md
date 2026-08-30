@@ -4,7 +4,7 @@ KitchooK! is a self-hosted cookbook built from plain Markdown recipes. Recipe co
 
 ## Current status
 
-**Phases 0–6 are complete. Phase 7 repository automation is implemented; TrueNAS runner provisioning and live end-to-end acceptance are pending.** The current site includes:
+**Phases 0–7 are complete and live-verified.** The current site includes:
 
 - validated top-level Markdown recipes with colocated, optimized images;
 - active-only static recipe routes and an alphabetized browse page;
@@ -63,7 +63,7 @@ After validation, a push-only deploy job targets the repository-scoped `[self-ho
 
 The live layout is `<dataset>/site/releases/<release-id>` plus a relative `site/current`, with Caddy mounting the parent `site/` path read-only. TrueNAS bridge networking publishes a selected host port to container port 8080, so LAN clients use `http://<truenas-ip>:<host-port>` without requiring local DNS.
 
-TrueNAS 25.04.2.6 serves the desired release from a dedicated Host Path dataset. Phase 6 live acceptance passed for the hardened container settings, Caddy write denial, dedicated publisher scope and atomic switch/rollback, app stop/start, container-replacement persistence, authenticated Cloudflare access, phone/tablet rendering, the intended kitchen tablet, and a desktop browser. Phase 7's repository checks pass, but the separate runner still must be provisioned and accepted on that host before unattended deployment is called live.
+TrueNAS 25.04.2.6 serves the desired release from a dedicated Host Path dataset. Phase 6 live acceptance passed for the hardened Caddy settings, write denial, atomic release selection, container-replacement persistence, authenticated Cloudflare access, and representative household devices. Phase 7 live acceptance passed for the separate least-privilege runner, same-run digest-verified artifact deployment, full-SHA release selection, byte-verified LAN and authenticated delivery, safe retry, ephemeral workspace cleanup, and migration from the old publisher ACL.
 
 Remote access uses Cloudflare Tunnel with a self-hosted Access application restricted to approved identities; anonymous requests were verified to redirect to Cloudflare Access rather than exposing origin content. There is no router port-forward. Any future hostname must receive equivalent fail-closed authentication—bot, scraper, or AI blocking and TLS are not authentication.
 
