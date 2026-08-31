@@ -306,7 +306,7 @@ Acceptance:
 
 ## Phase 1 — Formalize the reusable application boundary
 
-**Status: In progress.**
+**Status: Complete.**
 
 Deliverables:
 
@@ -355,17 +355,15 @@ Acceptance:
 - the image contains no private content or production credentials; and
 - the release can be reproduced from its documented source revision and locked dependencies.
 
-### Phase 2 integration gate
+### Phase 2 integration record
 
-Until Phase 3 moves the self-hosted runner, Phase 2 implementation work must remain off `main`: a push to `main` still schedules the owner's production deployment job. Pull-request validation remains GitHub-hosted and is safe for the builder branch.
-
-Phase 3 needs a pinned builder image, so a validated semantic tag may be created from the Phase 2 commit before it is merged to `main`. The tag-triggered release workflow must remain GitHub-hosted-only and must not target the deployment runner. While this repository remains private, preserve appropriate registry access controls for that image. Merge the builder work to `main` only as part of the Phase 3 runner migration, after the public repository no longer has a production-targeting job.
+Phase 2 implementation remained off `main` while this repository still targeted the owner's runner. The `v0.1.0` tag published the builder from the verified Phase 2 commit through the GitHub-hosted-only release workflow, allowing the private instance to pin its digest before migration. After Phase 3 moved and re-scoped the runner, the builder work merged to `main`; the public workflow now has no production-targeting job.
 
 ---
 
 ## Phase 3 — Split and migrate the owner instance
 
-**Status: Complete.**
+**Status: In progress — migration acceptance passed; one controlled builder-pin upgrade rehearsal remains.**
 
 This phase must complete before the public repository accepts untrusted contributions.
 
