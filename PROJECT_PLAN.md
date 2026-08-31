@@ -365,7 +365,7 @@ Phase 3 needs a pinned builder image, so a validated semantic tag may be created
 
 ## Phase 3 — Split and migrate the owner instance
 
-**Status: In progress.**
+**Status: Complete.**
 
 This phase must complete before the public repository accepts untrusted contributions.
 
