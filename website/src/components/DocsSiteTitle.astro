@@ -1,0 +1,8 @@
+---
+const { siteTitleHref } = (Astro.locals as { starlightRoute: { siteTitleHref: string } }).starlightRoute;
+---
+
+<a href={siteTitleHref} class="docs-wordmark" aria-label="KitchooK! documentation home">
+  <span class="docs-wordmark-name">KitchooK</span><span class="docs-wordmark-mark">!</span>
+  <span class="sr-only" translate="no">KitchooK! Docs</span>
+</a>

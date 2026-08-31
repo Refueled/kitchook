@@ -12,6 +12,8 @@ interface Props {
 
 const { title, description, mainClass, showHeaderSearch = false } = Astro.props;
 const deploymentId = import.meta.env.PUBLIC_DEPLOYMENT_ID || 'local-build';
+const isKitchooKBrand = instanceConfig.title === 'KitchooK!';
+const wordmarkText = isKitchooKBrand ? 'KitchooK' : instanceConfig.title;
 const canonicalUrl = instanceConfig.canonicalOrigin
   ? new URL(Astro.url.pathname, instanceConfig.canonicalOrigin).href
   : undefined;
@@ -32,7 +34,9 @@ const canonicalUrl = instanceConfig.canonicalOrigin
 
     <header class="site-header">
       <div class:list={["site-header__inner", { "site-header__inner--search": showHeaderSearch }]}>
-        <a class="wordmark" href="/" aria-label={`${instanceConfig.title} home`}>{instanceConfig.title}</a>
+        <a class="wordmark" href="/" aria-label={`${instanceConfig.title} home`}>
+          {wordmarkText}{isKitchooKBrand && <span class="wordmark__mark">!</span>}
+        </a>
 
         {showHeaderSearch && (
           <div class="desktop-header-search">
@@ -74,7 +78,7 @@ const canonicalUrl = instanceConfig.canonicalOrigin
             aria-describedby="deployment-tooltip"
             aria-label={`${instanceConfig.title} deployment ${deploymentId}. Copy deployment identifier.`}
           >
-            {instanceConfig.title}
+            {wordmarkText}{isKitchooKBrand && <span class="wordmark__mark">!</span>}
             <span class="footer-deployment__tooltip" id="deployment-tooltip" role="tooltip" data-deployment-tooltip>
               Deployment {deploymentId} — click to copy
             </span>

@@ -1,0 +1,72 @@
+---
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+import '../styles/marketing.css';
+---
+
+<MarketingLayout>
+  <header class="site-header">
+    <a class="wordmark" href="/" aria-label="KitchooK! home">KitchooK<span>!</span></a>
+    <nav aria-label="Main navigation">
+      <a class="nav-link" href="/docs/introduction/quick-start/">Quick start</a>
+      <a class="nav-link" href="/docs/introduction/">Docs</a>
+      <a class="nav-link" href="https://github.com/Refueled/kitchook">Source <span aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <p class="eyebrow">A static cookbook builder</p>
+      <h1 id="hero-title">Your recipes are files.<br />Your cookbook is <em>everywhere.</em></h1>
+      <p class="lede">KitchooK! turns ordinary Markdown recipes and colocated images into a fast, searchable static site you can keep and host anywhere.</p>
+      <div class="actions">
+        <a class="button primary" href="/docs/introduction/quick-start/">Build your cookbook <span aria-hidden="true">→</span></a>
+        <a class="button secondary" href="https://demo.kitchook.com">See the live demo <span aria-hidden="true">↗</span></a>
+      </div>
+      <p class="reassurance">No database. No CMS. No runtime server.</p>
+    </section>
+
+    <section class="principles" aria-label="KitchooK! principles">
+      <article>
+        <p class="number">01</p>
+        <h2>Markdown stays canonical.</h2>
+        <p>Your recipes remain useful without KitchooK!, a database, or a hosted service. Keep images beside the recipe they belong to.</p>
+      </article>
+      <article>
+        <p class="number">02</p>
+        <h2>Build once. Host anywhere.</h2>
+        <p>Generate plain HTML, assets, search, and a recipe API at build time. Serve the resulting files from any ordinary static host.</p>
+      </article>
+      <article>
+        <p class="number">03</p>
+        <h2>Your content stays yours.</h2>
+        <p>Use a private recipe repository, pin the builder version you trust, and upgrade the application independently from your recipes.</p>
+      </article>
+    </section>
+
+    <section class="workflow" aria-labelledby="workflow-title">
+      <div>
+        <p class="eyebrow">A small, durable contract</p>
+        <h2 id="workflow-title">From a recipe folder to a portable site.</h2>
+      </div>
+      <ol>
+        <li><strong>Write</strong><span>Markdown and images</span></li>
+        <li><strong>Build</strong><span>with source or a pinned container</span></li>
+        <li><strong>Serve</strong><span>the generated static files</span></li>
+      </ol>
+      <a class="text-link nav-link" href="/docs/introduction/how-it-works/">How static generation works <span aria-hidden="true">→</span></a>
+    </section>
+
+    <section class="demo-callout" aria-labelledby="demo-title">
+      <p class="eyebrow">Try it before you build it</p>
+      <h2 id="demo-title">A real cookbook, generated from public recipes.</h2>
+      <p>The demo is a separate static artifact. It uses the same builder and public examples—nothing from a private collection.</p>
+      <a class="button primary" href="https://demo.kitchook.com">Open demo.kitchook.com <span aria-hidden="true">↗</span></a>
+    </section>
+  </main>
+
+  <footer>
+    <a class="wordmark" href="/" aria-label="KitchooK! home">KitchooK<span>!</span></a>
+    <p>Markdown recipes, made portable.</p>
+    <div><a class="nav-link" href="/docs/introduction/">Documentation</a><a class="nav-link" href="https://github.com/Refueled/kitchook">GitHub</a><a class="nav-link" href="/docs/project/contributing-and-security/">Security</a></div>
+  </footer>
+</MarketingLayout>

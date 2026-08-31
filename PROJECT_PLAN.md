@@ -32,7 +32,7 @@ The repository currently contains five intentional example recipes: three active
 
 ## Current handoff status
 
-**Completed:** Phases 0 through 4. **Next:** Phase 5 — build `kitchook.com`.
+**Completed:** Phases 0 through 4. **In progress:** Phase 5 — build `kitchook.com`.
 
 - The current public builder release is [`v0.1.1`](docs/releases.md), published at `ghcr.io/refueled/kitchook:0.1.1@sha256:dcefbeaa25652c1d4117e20e59c154018ff12b25b826eed9b97b0f177b032eee`. The GHCR package is publicly readable and was consumed successfully by a disposable private clean-room repository on a fresh GitHub-hosted runner.
 - The private owner instance pins that exact release. Its `v0.1.1` upgrade, same-run deployment, rollback to the prior immutable artifact, and return to the upgraded artifact were all verified; the selected production artifact remains independent of either repository.
@@ -440,7 +440,7 @@ Documentation validation passed locally: the source build completed with the bun
 
 ## Phase 5 — Build `kitchook.com`
 
-**Status: Not started.**
+**Status: In progress.**
 
 Deliverables:
 
