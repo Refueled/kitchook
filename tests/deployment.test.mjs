@@ -276,6 +276,15 @@ test('public workflow cannot target a self-hosted runner and the reusable templa
   assert.match(entrypoint, /-exec cp -a --no-preserve=ownership,timestamps/);
 });
 
+test('KitchooK! wordmarks preserve the coral exclamation mark', async () => {
+  const layout = await readFile(path.join(repositoryRoot, 'src', 'layouts', 'BaseLayout.astro'), 'utf8');
+  const styles = await readFile(path.join(repositoryRoot, 'src', 'styles', 'global.css'), 'utf8');
+
+  assert.match(layout, /const isKitchooKBrand = instanceConfig\.title === 'KitchooK!'/);
+  assert.equal((layout.match(/class="wordmark__mark"/g) || []).length, 2);
+  assert.match(styles, /\.wordmark__mark \{\s+color: var\(--coral\);/);
+});
+
 test('footer exposes and copies the build deployment identifier', async () => {
   const workflow = await readFile(path.join(repositoryRoot, '.github', 'workflows', 'ci.yml'), 'utf8');
   const layout = await readFile(path.join(repositoryRoot, 'src', 'layouts', 'BaseLayout.astro'), 'utf8');

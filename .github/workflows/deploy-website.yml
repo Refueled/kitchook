@@ -1,0 +1,57 @@
+name: Deploy kitchook.com
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'website/**'
+      - '.github/workflows/deploy-website.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kitchook-website-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and deploy website
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: website-production
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+
+      - name: Install locked website dependencies
+        working-directory: website
+        run: npm ci --ignore-scripts
+
+      - name: Check and build website
+        working-directory: website
+        run: |
+          npm run check
+          npm run build
+
+      - name: Deploy completed static artifact
+        working-directory: website
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: >-
+          npx --no-install wrangler pages deploy dist
+          --project-name=kitchook-com
+          --branch=main
