@@ -30,6 +30,17 @@ The repository currently contains five intentional example recipes: three active
 
 ---
 
+## Current handoff status
+
+**Completed:** Phases 0 through 4. **Next:** Phase 5 — build `kitchook.com`.
+
+- The current public builder release is [`v0.1.1`](docs/releases.md), published at `ghcr.io/refueled/kitchook:0.1.1@sha256:dcefbeaa25652c1d4117e20e59c154018ff12b25b826eed9b97b0f177b032eee`. The GHCR package is publicly readable and was consumed successfully by a disposable private clean-room repository on a fresh GitHub-hosted runner.
+- The private owner instance pins that exact release. Its `v0.1.1` upgrade, same-run deployment, rollback to the prior immutable artifact, and return to the upgraded artifact were all verified; the selected production artifact remains independent of either repository.
+- Phase 4 documentation has been exercised through source and OCI builds, ordinary static hosting, Caddy, and private S3/CloudFront. The S3/CloudFront guide requires the documented viewer-request directory-index function and restricted missing-object lookup permission; these are not optional when using a private S3 REST origin.
+- No Phase 3 or Phase 4 acceptance work remains. Do not treat this status as approval to make the source repository public: Phase 6 public-project controls, final review, and launch work remain outstanding.
+
+---
+
 ## 2. Product Goal
 
 KitchooK! should be installable according to one simple contract:
@@ -331,7 +342,7 @@ Acceptance:
 
 ## Phase 2 — Produce a versioned builder and release process
 
-**Status: Complete (`v0.1.0`).**
+**Status: Complete (initial `v0.1.0`; current release `v0.1.1`).**
 
 Deliverables:
 
