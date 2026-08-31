@@ -363,7 +363,7 @@ Phase 2 implementation remained off `main` while this repository still targeted 
 
 ## Phase 3 — Split and migrate the owner instance
 
-**Status: In progress — migration acceptance passed; one controlled builder-pin upgrade rehearsal remains.**
+**Status: Complete.**
 
 This phase must complete before the public repository accepts untrusted contributions.
 
@@ -387,6 +387,10 @@ Acceptance:
 - Caddy serves the migrated artifact without requiring a new runtime architecture;
 - the public repository has no job capable of targeting the owner's runner; and
 - disabling or deleting either repository does not destroy the selected static production release.
+
+### Phase 3 builder-pin upgrade rehearsal
+
+The owner instance upgraded its sole builder pin from `v0.1.0` to the newly released `v0.1.1` image and matching immutable digest. GitHub-hosted validation built the private collection with that pin; the repository-scoped runner deployed the same-run artifact under full release ID `e0e057efb9073f4228e5b789a3e33ef4e7af4e1b` and completed its direct-origin verification. The prior selected immutable release `2026c4f0f1e763b97bad2932f5b7c42c1193547b` was then selected and byte-verified through Caddy before selection returned to `e0e057efb9073f4228e5b789a3e33ef4e7af4e1b` and was byte-verified again. No rebuild or Caddy restart was required for either release selection.
 
 ---
 
