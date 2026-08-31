@@ -62,7 +62,7 @@ jobs:
         run: |
           set -euo pipefail
           output="$RUNNER_TEMP/kitchook-builder-output"
-          install -d -o 1000 -g 1000 "$output"
+          sudo install -d -o 1000 -g 1000 "$output"
           touch "$output/preexisting-artifact"
           chown 1000:1000 "$output/preexisting-artifact"
 
