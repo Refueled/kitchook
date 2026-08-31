@@ -13,7 +13,7 @@
 
 /* Keep the mobile menu toggle visually aligned with the adjacent search icon. */
 starlight-menu-button button,
-starlight-menu-button[aria-expanded='true'] button { background-color: transparent !important; border-radius: 0 !important; box-shadow: none !important; color: var(--sl-color-gray-1) !important; }
+starlight-menu-button[aria-expanded='true'] button { background-color: transparent !important; border-radius: 0 !important; box-shadow: none !important; color: var(--sl-color-gray-1) !important; font-size: var(--sl-text-xl) !important; }
 
 :focus-visible { outline: 4px solid #005fcc; outline-offset: 4px; }
 :root[data-theme='dark'] :focus-visible { outline-color: #7cc4ff; }
