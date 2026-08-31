@@ -20,7 +20,7 @@ The workflows direct-upload the already-built static artifacts with the locked `
 - `.github/workflows/deploy-website.yml` runs only when `website/**` changes on `main`; it checks, builds, verifies local links, and deploys `website/dist/` to `kitchook-com`.
 - `.github/workflows/deploy-demo.yml` runs only when public builder/example inputs change on `main`; it runs the root test/build and deploys root `dist/` to `demo-kitchook-com`.
 - Neither workflow targets a self-hosted runner. Both use `npm ci --ignore-scripts` and the GitHub-hosted `ubuntu-latest` runner.
-- Cloudflare Pages serves immutable fingerprinted assets with its normal CDN cache behavior. Treat HTML updates as cache-sensitive: purge the affected URL or use the Pages deployment rollback control if a stale response persists.
+- The committed `_headers` files cache fingerprinted `/_astro/` assets for one year with `immutable`; HTML, search, and API responses remain revalidatable. Treat HTML updates as cache-sensitive: purge the affected URL or use the Pages deployment rollback control if a stale response persists.
 
 ## Redirects, verification, and recovery
 

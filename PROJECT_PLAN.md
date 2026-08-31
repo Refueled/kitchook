@@ -34,8 +34,8 @@ The repository currently contains five intentional example recipes: three active
 
 **Completed:** Phases 0 through 4. **In progress:** Phase 5 — build `kitchook.com`.
 
-- The current public builder release is [`v0.1.1`](docs/releases.md), published at `ghcr.io/refueled/kitchook:0.1.1@sha256:dcefbeaa25652c1d4117e20e59c154018ff12b25b826eed9b97b0f177b032eee`. The GHCR package is publicly readable and was consumed successfully by a disposable private clean-room repository on a fresh GitHub-hosted runner.
-- The private owner instance pins that exact release. Its `v0.1.1` upgrade, same-run deployment, rollback to the prior immutable artifact, and return to the upgraded artifact were all verified; the selected production artifact remains independent of either repository.
+- The current public builder release is [`v0.1.2`](docs/releases.md), published at `ghcr.io/refueled/kitchook:0.1.2@sha256:37e3fd9505493324d2c5cf41c003f53a210963db2cf5a61f541560ad1d585ffb`. The GHCR package is publicly readable and was consumed successfully by a disposable private clean-room repository on a fresh GitHub-hosted runner.
+- The private owner instance pins that exact release. Its `v0.1.2` upgrade built, published, and origin-verified the same-run artifact under immutable release ID `8fdf888ce042f8acee4da681c2173ea1f5fb007a`; the selected production artifact remains independent of either repository.
 - Phase 4 documentation has been exercised through source and OCI builds, ordinary static hosting, Caddy, and private S3/CloudFront. The S3/CloudFront guide requires the documented viewer-request directory-index function and restricted missing-object lookup permission; these are not optional when using a private S3 REST origin.
 - No Phase 3 or Phase 4 acceptance work remains. Do not treat this status as approval to make the source repository public: Phase 6 public-project controls, final review, and launch work remain outstanding.
 

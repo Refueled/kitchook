@@ -49,4 +49,9 @@ if (broken.length) {
   process.exit(1);
 }
 
-console.log(`Verified local links in ${htmlFiles.length} HTML files.`);
+const headers = await readFile(resolve(output, '_headers'), 'utf8');
+if (!headers.includes('/_astro/*\n  Cache-Control: public, max-age=31536000, immutable')) {
+  throw new Error('Missing immutable cache policy for fingerprinted Astro assets.');
+}
+
+console.log(`Verified local links and cache policy in ${htmlFiles.length} HTML files.`);
