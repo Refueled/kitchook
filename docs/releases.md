@@ -25,3 +25,21 @@ Consumers pin the release version and image digest in their private instance rep
 5. Confirm the GitHub release's source revision, image manifest digest, provenance attestation, and both platform manifests before changing an instance pin.
 
 The tag workflow is intentionally the only publication path. Pull requests and ordinary branch pushes do not receive registry credentials or publish images.
+
+## Upgrade an instance
+
+Keep recipes and the selected builder pin under separate version control. To upgrade:
+
+1. Read the target release notes and compatibility/migration notes.
+2. Change the image tag **and matching immutable digest** in the private instance repository.
+3. Build the unchanged collection in a test environment and verify the homepage, a recipe route, `/search/index.json`, and `/api/recipes.json`.
+4. Publish the resulting static artifact using the normal host procedure.
+5. Retain the prior artifact until the new deployment has been checked through the real host/CDN.
+
+Do not use a floating tag such as `latest`, and do not silently replace a digest. Recipe-only commits do not require a KitchooK! upgrade.
+
+## Roll back
+
+A static-site rollback selects or restores the previously verified artifact; it does not require rebuilding recipes or downgrading the builder image. Use the rollback mechanism of the host (for example, a prior immutable release directory, an S3 object-version/release prefix, or a previous deployment artifact), then invalidate any CDN paths whose non-asset content is cached. Verify the same homepage, recipe, search, and API paths afterward.
+
+For the advanced TrueNAS immutable-release profile, use the documented `select-release.sh` procedure in [the operator runbook](../infrastructure/README.md#automated-deployment-release-switch-and-rollback). Keep private recipe backups, the selected public release/digest, and host configuration: together they are the recovery set.

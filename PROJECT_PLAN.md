@@ -392,7 +392,7 @@ Acceptance:
 
 ## Phase 4 — Write and test distribution documentation
 
-**Status: Not started.**
+**Status: Complete.**
 
 Deliverables:
 
@@ -416,6 +416,10 @@ Acceptance:
 - every dependency-install command explicitly disables lifecycle scripts;
 - examples contain placeholders rather than owner-specific paths, addresses, repositories, or credentials; and
 - the documentation clearly separates building from hosting.
+
+### Phase 4 validation record
+
+Documentation validation passed locally: the source build completed with the bundled examples; the OCI builder produced the alternate-cookbook fixture through its documented named-volume path; and the resulting artifact was served and checked through both an ordinary static-file server and the documented Caddy profile, including route, search/API, 404, and cache-header checks. A project-controlled S3/CloudFront validation also passed with a private OAC bucket, directory-index viewer-request function, restricted missing-object lookup permission, HTTPS redirect, cache policies, invalidation, and end-to-end homepage/route/search/API/404 verification. Finally, a disposable private recipe repository ran the documented public, digest-pinned OCI builder on a fresh GitHub-hosted runner; its uploaded artifact was deployed to the validation distribution and verified through CloudFront with the clean-room homepage, route, search/API, and 404 checks.
 
 ---
 

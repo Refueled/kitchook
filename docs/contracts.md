@@ -15,7 +15,7 @@ my-cookbook/
         └── optional-image.jpg
 ```
 
-`recipes/` follows the [recipe authoring contract](../README.md#authoring-recipes): recipe IDs come from directory names, images are resolved beside `recipe.md`, and only active recipes are published. At least one active recipe is required.
+`recipes/` follows the [recipe authoring contract](authoring.md): recipe IDs come from directory names, images are resolved beside `recipe.md`, and only active recipes are published. At least one active recipe is required.
 
 For example, from an application checkout:
 
