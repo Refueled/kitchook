@@ -63,8 +63,8 @@ jobs:
           set -euo pipefail
           output="$RUNNER_TEMP/kitchook-builder-output"
           sudo install -d -o 1000 -g 1000 "$output"
-          touch "$output/preexisting-artifact"
-          chown 1000:1000 "$output/preexisting-artifact"
+          sudo touch "$output/preexisting-artifact"
+          sudo chown 1000:1000 "$output/preexisting-artifact"
 
           if docker run --rm \
             -v "$PWD/tests/fixtures/malformed-cookbook:/input:ro" \
