@@ -2,6 +2,7 @@
 import RecipeCard from '../components/RecipeCard.astro';
 import SearchForm from '../components/SearchForm.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { instanceConfig } from '../lib/instance-config';
 import { getPublishedRecipes } from '../lib/recipes';
 
 const recipes = await getPublishedRecipes();
@@ -9,8 +10,8 @@ const recipeCount = `${recipes.length} published ${recipes.length === 1 ? 'recip
 ---
 
 <BaseLayout
-  title="KitchooK!"
-  description="A fast, static cookbook of practical recipes kept in Markdown."
+  title={instanceConfig.title}
+  description={instanceConfig.description}
   showHeaderSearch={false}
 >
   <section class="home-intro" aria-labelledby="home-title">

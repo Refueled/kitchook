@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-const distDirectory = resolve('dist');
+const distDirectory = resolve(process.env.KITCHOOK_OUTPUT_DIR || 'dist');
 const artifactPath = resolve(distDirectory, 'api/recipes.json');
 const recipesDirectory = resolve(distDirectory, 'recipes');
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;

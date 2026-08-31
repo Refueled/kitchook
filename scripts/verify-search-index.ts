@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 import MiniSearch from 'minisearch';
 import { SEARCH_STORE_FIELDS, searchIndexOptions, type SearchDocument } from '../src/lib/search.ts';
 
-const distDirectory = resolve('dist');
+const distDirectory = resolve(process.env.KITCHOOK_OUTPUT_DIR || 'dist');
 const artifactPath = resolve(distDirectory, 'search/index.json');
 const recipesDirectory = resolve(distDirectory, 'recipes');
 

@@ -1,6 +1,8 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { resolve } from 'node:path';
+import { getContentDirectory } from './lib/instance-config';
 
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const nonEmptyString = z.string().trim().min(1);
@@ -9,7 +11,7 @@ const minutes = z.number().int().nonnegative();
 
 const recipes = defineCollection({
   loader: glob({
-    base: './recipes',
+    base: resolve(getContentDirectory(), 'recipes'),
     pattern: '*/recipe.md',
     generateId: ({ entry }) => {
       const parts = entry.split('/');

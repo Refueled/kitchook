@@ -11,11 +11,17 @@ export async function getPublishedRecipes(): Promise<RecipeEntry[]> {
     }
   }
 
-  return recipes
+  const published = recipes
     .filter((recipe) => recipe.data.status === 'active')
     .sort(
       (left, right) =>
         left.data.title.localeCompare(right.data.title, 'en') ||
         left.id.localeCompare(right.id, 'en'),
     );
+
+  if (published.length === 0) {
+    throw new Error('A cookbook must contain at least one active recipe.');
+  }
+
+  return published;
 }
