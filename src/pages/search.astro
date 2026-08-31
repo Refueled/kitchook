@@ -1,6 +1,7 @@
 ---
 import RecipeSearch from '../components/RecipeSearch.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { instanceConfig } from '../lib/instance-config';
 import { getPublishedRecipes } from '../lib/recipes';
 
 const recipes = await getPublishedRecipes();
@@ -10,8 +11,8 @@ const tags = [...new Set(recipes.flatMap(({ data }) => data.tags))].sort(collato
 ---
 
 <BaseLayout
-  title="Search recipes | KitchooK!"
-  description="Search Kitchook recipes by title, ingredient, category, tag, and recipe text."
+  title={`Search recipes | ${instanceConfig.title}`}
+  description={`Search ${instanceConfig.title} recipes by title, ingredient, category, tag, and recipe text.`}
   showHeaderSearch={false}
   mainClass="search-page"
 >

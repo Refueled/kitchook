@@ -20,7 +20,7 @@ KitchooK! is a self-hosted cookbook built from plain Markdown recipes. Recipe co
 
 Recipe browsing and direct recipe pages continue to work without JavaScript. JavaScript is limited to interactive search and the progressively enhanced mobile header search disclosure.
 
-See [PROJECT_PLAN.md](PROJECT_PLAN.md) for the current architecture and roadmap and [docs/BRAND.md](docs/BRAND.md) for the durable visual identity guidelines.
+See [PROJECT_PLAN.md](PROJECT_PLAN.md) for the current architecture and roadmap, [docs/contracts.md](docs/contracts.md) for the content/configuration/output contracts, [docs/builder.md](docs/builder.md) for the OCI builder interface, [docs/releases.md](docs/releases.md) for releases and compatibility, and [docs/BRAND.md](docs/BRAND.md) for the durable visual identity guidelines.
 
 ## Prerequisites
 
@@ -66,6 +66,16 @@ The live layout is `<dataset>/site/releases/<release-id>` plus a relative `site/
 TrueNAS 25.04.2.6 serves the desired release from a dedicated Host Path dataset. Phase 6 live acceptance passed for the hardened Caddy settings, write denial, atomic release selection, container-replacement persistence, authenticated Cloudflare access, and representative household devices. Phase 7 live acceptance passed for the separate least-privilege runner, same-run digest-verified artifact deployment, full-SHA release selection, byte-verified LAN and authenticated delivery, safe retry, ephemeral workspace cleanup, and migration from the old publisher ACL.
 
 Remote access uses Cloudflare Tunnel with a self-hosted Access application restricted to approved identities; anonymous requests were verified to redirect to Cloudflare Access rather than exposing origin content. There is no router port-forward. Any future hostname must receive equivalent fail-closed authentication—bot, scraper, or AI blocking and TLS are not authentication.
+
+## Using another recipe collection
+
+The bundled recipes are examples. Build another cookbook without changing `src/` by placing `recipes/` and the required `instance.config.json` in one content directory, then setting `KITCHOOK_CONTENT_DIR`:
+
+```sh
+KITCHOOK_CONTENT_DIR=/absolute/path/to/my-cookbook npm run build
+```
+
+See [`docs/contracts.md`](docs/contracts.md) for the complete input, configuration, output, and compatibility contracts.
 
 ## Authoring recipes
 

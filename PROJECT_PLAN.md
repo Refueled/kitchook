@@ -306,7 +306,7 @@ Acceptance:
 
 ## Phase 1 — Formalize the reusable application boundary
 
-**Status: Not started.**
+**Status: In progress.**
 
 Deliverables:
 
@@ -331,7 +331,7 @@ Acceptance:
 
 ## Phase 2 — Produce a versioned builder and release process
 
-**Status: Not started.**
+**Status: In progress.**
 
 Deliverables:
 
@@ -354,6 +354,12 @@ Acceptance:
 - generated homepage, recipe routes, search index, and API export pass existing verification;
 - the image contains no private content or production credentials; and
 - the release can be reproduced from its documented source revision and locked dependencies.
+
+### Phase 2 integration gate
+
+Until Phase 3 moves the self-hosted runner, Phase 2 implementation work must remain off `main`: a push to `main` still schedules the owner's production deployment job. Pull-request validation remains GitHub-hosted and is safe for the builder branch.
+
+Phase 3 needs a pinned builder image, so a validated semantic tag may be created from the Phase 2 commit before it is merged to `main`. The tag-triggered release workflow must remain GitHub-hosted-only and must not target the deployment runner. While this repository remains private, preserve appropriate registry access controls for that image. Merge the builder work to `main` only as part of the Phase 3 runner migration, after the public repository no longer has a production-targeting job.
 
 ---
 
@@ -604,9 +610,9 @@ If builder publication requires temporary sequencing changes, Caddy may continue
 These decisions are intentionally bounded and must be recorded before their relevant phase is accepted:
 
 1. the private owner-instance repository name;
-2. builder registry/image name and supported architectures;
-3. the initial semantic release number;
-4. the exact instance configuration format and minimum fields;
+2. **Resolved (Phase 2):** `ghcr.io/refueled/kitchook`, publishing `linux/amd64` and `linux/arm64`.
+3. **Resolved (Phase 2):** `0.1.0` is the initial distribution release.
+4. **Resolved (Phase 1):** `instance.config.json` at the selected content-directory root; required non-blank `title` and `description`, plus optional origin-only `canonicalOrigin`. The content directory contains both this file and `recipes/` and is selected with `KITCHOOK_CONTENT_DIR` (default: repository root). Deployment identifiers remain deployment metadata.
 5. whether `website/` remains in this repository or receives a demonstrated reason for separation;
 6. the hosting provider for `kitchook.com`;
 7. whether a live demo uses a subdomain or a route within the documentation site; and

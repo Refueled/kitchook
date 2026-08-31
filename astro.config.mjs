@@ -1,3 +1,8 @@
+import { resolve } from 'node:path';
 import { defineConfig } from 'astro/config';
 
-export default defineConfig({});
+const outputDirectory = process.env.KITCHOOK_OUTPUT_DIR;
+
+export default defineConfig({
+  ...(outputDirectory ? { outDir: resolve(outputDirectory) } : {}),
+});

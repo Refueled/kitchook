@@ -1,5 +1,6 @@
 ---
 import SearchForm from '../components/SearchForm.astro';
+import { instanceConfig } from '../lib/instance-config';
 import '../styles/global.css';
 
 interface Props {
@@ -11,6 +12,9 @@ interface Props {
 
 const { title, description, mainClass, showHeaderSearch = false } = Astro.props;
 const deploymentId = import.meta.env.PUBLIC_DEPLOYMENT_ID || 'local-build';
+const canonicalUrl = instanceConfig.canonicalOrigin
+  ? new URL(Astro.url.pathname, instanceConfig.canonicalOrigin).href
+  : undefined;
 ---
 
 <!doctype html>
@@ -20,6 +24,7 @@ const deploymentId = import.meta.env.PUBLIC_DEPLOYMENT_ID || 'local-build';
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
     <meta name="color-scheme" content="light dark" />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
     <title>{title}</title>
   </head>
   <body>
@@ -27,7 +32,7 @@ const deploymentId = import.meta.env.PUBLIC_DEPLOYMENT_ID || 'local-build';
 
     <header class="site-header">
       <div class:list={["site-header__inner", { "site-header__inner--search": showHeaderSearch }]}>
-        <a class="wordmark" href="/" aria-label="KitchooK home">KitchooK<span class="wordmark__mark" aria-hidden="true">!</span></a>
+        <a class="wordmark" href="/" aria-label={`${instanceConfig.title} home`}>{instanceConfig.title}</a>
 
         {showHeaderSearch && (
           <div class="desktop-header-search">
@@ -67,9 +72,9 @@ const deploymentId = import.meta.env.PUBLIC_DEPLOYMENT_ID || 'local-build';
             data-deployment-copy
             data-deployment-id={deploymentId}
             aria-describedby="deployment-tooltip"
-            aria-label={`KitchooK! deployment ${deploymentId}. Copy deployment identifier.`}
+            aria-label={`${instanceConfig.title} deployment ${deploymentId}. Copy deployment identifier.`}
           >
-            KitchooK<span class="wordmark__mark" aria-hidden="true">!</span>
+            {instanceConfig.title}
             <span class="footer-deployment__tooltip" id="deployment-tooltip" role="tooltip" data-deployment-tooltip>
               Deployment {deploymentId} — click to copy
             </span>
