@@ -262,6 +262,35 @@ button {
   padding-block: clamp(2rem, 6vw, 5rem);
 }
 
+.not-found {
+  display: grid;
+  place-items: center;
+}
+
+.not-found__content {
+  max-width: 42rem;
+  border: var(--border-width) solid var(--border);
+  padding: clamp(1.5rem, 5vw, 3rem);
+  background: var(--yellow);
+  box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--shadow);
+}
+
+.not-found__content h1 {
+  margin: 0;
+}
+
+.not-found__content p:not(.not-found__eyebrow) {
+  max-width: 34rem;
+  font-size: var(--step-1);
+}
+
+.not-found__eyebrow {
+  margin: 0 0 0.5rem;
+  font-family: "Syne", var(--body-font);
+  font-size: var(--step-3);
+  font-weight: 700;
+}
+
 .site-footer {
   margin-top: clamp(2rem, 5vw, 4rem);
   border-top: var(--border-width) solid var(--border);

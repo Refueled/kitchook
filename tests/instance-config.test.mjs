@@ -65,4 +65,10 @@ test('an alternate content directory builds routes, search, API output, and conf
     ['lemon-rice'],
   );
   assert.ok(existsSync(join(outputDirectory, 'search/index.json')));
+  assert.ok(existsSync(join(outputDirectory, '404.html')));
+  assert.match(readFileSync(join(outputDirectory, '404.html'), 'utf8'), /That recipe is not on the counter\./);
+  assert.match(
+    readFileSync(join(outputDirectory, '_headers'), 'utf8'),
+    /\/_astro\/\*\n  Cache-Control: public, max-age=31536000, immutable/,
+  );
 });

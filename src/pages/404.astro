@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { instanceConfig } from '../lib/instance-config';
+---
+
+<BaseLayout
+  title={`Page not found | ${instanceConfig.title}`}
+  description="The page you requested could not be found."
+  mainClass="not-found"
+>
+  <section class="not-found__content" aria-labelledby="not-found-title">
+    <p class="not-found__eyebrow">404</p>
+    <h1 id="not-found-title">That recipe is not on the counter.</h1>
+    <p>Check the address, or return to the cookbook and find something worth making.</p>
+    <a class="search-form__button" href="/">Back to all recipes</a>
+  </section>
+</BaseLayout>
