@@ -331,7 +331,7 @@ Acceptance:
 
 ## Phase 2 — Produce a versioned builder and release process
 
-**Status: In progress.**
+**Status: Complete (`v0.1.0`).**
 
 Deliverables:
 
@@ -365,7 +365,7 @@ Phase 3 needs a pinned builder image, so a validated semantic tag may be created
 
 ## Phase 3 — Split and migrate the owner instance
 
-**Status: Not started.**
+**Status: In progress.**
 
 This phase must complete before the public repository accepts untrusted contributions.
 

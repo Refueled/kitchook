@@ -251,22 +251,16 @@ test('failed LAN-origin verification atomically restores and verifies the previo
   }
 });
 
-test('workflow and runner template preserve the deployment trust boundary', async () => {
+test('public workflow cannot target a self-hosted runner and the reusable template remains hardened', async () => {
   const workflow = await readFile(path.join(repositoryRoot, '.github', 'workflows', 'ci.yml'), 'utf8');
-  const deployJob = workflow.slice(workflow.indexOf('\n  deploy:'));
   const compose = await readFile(path.join(infrastructure, 'runner', 'compose.yml'), 'utf8');
   const entrypoint = await readFile(path.join(infrastructure, 'runner', 'entrypoint.sh'), 'utf8');
 
   assert.match(workflow, /cancel-in-progress: \$\{\{ github\.event_name == 'pull_request' \}\}/);
   assert.match(workflow, /format\('push-\{0\}', github\.run_id\)/);
-  assert.match(deployJob, /needs: validate/);
-  assert.match(deployJob, /github\.event_name == 'push'/);
-  assert.match(deployJob, /- self-hosted\n\s+- kitchook-deploy/);
-  assert.match(deployJob, /group: kitchook-production\n\s+cancel-in-progress: false/);
-  assert.match(deployJob, /git\/ref\/heads\/main/);
-  assert.match(deployJob, /actions\/download-artifact@[0-9a-f]{40}/);
-  assert.doesNotMatch(deployJob, /actions\/checkout/);
-  assert.doesNotMatch(deployJob, /npm (?:ci|install|i)\b/);
+  assert.doesNotMatch(workflow, /self-hosted/);
+  assert.doesNotMatch(workflow, /kitchook-deploy/);
+  assert.doesNotMatch(workflow, /Deploy production/);
 
   assert.match(compose, /user: "1001:1001"/);
   assert.match(compose, /read_only: true/);
