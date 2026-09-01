@@ -9,7 +9,7 @@ Use this path when you want to develop KitchooK! or build from a checked-out, pi
 ```sh
 git clone https://github.com/Refueled/kitchook.git
 cd kitchook
-git checkout v0.1.3
+git checkout v0.1.4
 npm ci --ignore-scripts
 npm test
 KITCHOOK_CONTENT_DIR=/absolute/path/to/my-cookbook npm run build
@@ -35,7 +35,7 @@ sudo chown 1000:1000 output
 docker run --rm \
   -v "$PWD/my-cookbook:/input:ro" \
   -v "$PWD/output:/output:rw" \
-  ghcr.io/refueled/kitchook:0.1.3@sha256:ea97b19f4634941eacbe83a05324f6497dc577cc48736b939fc696d08eac278b
+  ghcr.io/refueled/kitchook:0.1.4@sha256:079e6388159c529f21bb4c9e7152eddcfcd6ea69be68aaf07a9adf4be7b7728c
 ```
 
 Do not replace the digest with one from another tag. The builder stages and verifies the site before replacing output, so an invalid collection exits nonzero without publishing a partial artifact. It does not install dependencies, start a server, or contact a content service while building.

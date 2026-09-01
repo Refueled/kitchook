@@ -1,6 +1,6 @@
 # Releases and compatibility
 
-KitchooK! source and builder releases use [semantic versioning](https://semver.org/). The initial distribution release is `0.1.0`; `v0.1.3` is the current supported release. Notable user-visible changes are recorded in the root [`CHANGELOG.md`](../CHANGELOG.md).
+KitchooK! source and builder releases use [semantic versioning](https://semver.org/). The initial distribution release is `0.1.0`; `v0.1.4` is the current supported release. Notable user-visible changes are recorded in the root [`CHANGELOG.md`](../CHANGELOG.md).
 
 ## What a release contains
 
