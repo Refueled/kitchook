@@ -49,6 +49,7 @@ A successful build emits a host-independent `dist/` root containing at least:
 
 ```text
 index.html
+404.html
 recipes/
 search/index.json
 api/recipes.json

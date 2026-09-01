@@ -3,7 +3,7 @@ title: Local source build
 description: Build your cookbook locally with Node.js.
 ---
 
-The source repository is currently private while public-launch controls are completed. Until it opens, use the [builder container](/docs/building/builder-container/). Once source releases are public, clone the repository and check out the version you intend to use:
+Clone the public repository and check out the version you intend to use:
 
 ```sh
 git clone https://github.com/Refueled/kitchook.git

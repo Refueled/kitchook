@@ -3,9 +3,11 @@ title: Static web servers
 description: Host the built site with Caddy, Nginx, Apache, or another compatible static host.
 ---
 
-Copy the **contents** of `dist/` directly into the web root. The root should contain `index.html`, `recipes/`, `search/`, `api/`, and `_astro/`.
+Copy the **contents** of `dist/` directly into the web root. The root should contain `index.html`, `404.html`, `recipes/`, `search/`, `api/`, and `_astro/`.
 
 A compatible host must serve directory indexes, preserve root-relative URLs, serve ordinary HTML, JavaScript, JSON, and image files, and return a real 404 for missing paths. It does not need Node.js, a database, or an application backend. KitchooK! currently supports only the root of a domain or subdomain, not a subpath.
+
+See the [complete static-host guide](https://github.com/Refueled/kitchook/blob/main/docs/deploying.md#any-static-web-server) for Caddy and Nginx examples.
 
 ### Deployment checks
 

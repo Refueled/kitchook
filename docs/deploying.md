@@ -6,6 +6,7 @@ Before deployment, verify these paths exist in the artifact root:
 
 ```text
 index.html
+404.html
 recipes/
 search/index.json
 api/recipes.json

@@ -2,9 +2,9 @@
 
 > **Validation status:** Static serving and dedicated-runner deployment passed live acceptance on TrueNAS 25.04.2.6.
 
-This package serves KitchooK! as static files on TrueNAS Community Edition 25.04.2.6 and publishes successful `main` builds through a separate, repository-scoped runner app. Caddy runs as numeric non-root user `568:568`, listens on HTTP port 8080 inside a bridge-network container, and sees the generated site and its own configuration through read-only bind mounts. TrueNAS publishes one operator-selected host port. The deployment runner is isolated from Caddy and receives write access only to `site/` plus its own state.
+This package serves KitchooK! as static files on TrueNAS Community Edition 25.04.2.6 and includes optional tooling for publishing successful private-instance builds through a separate, repository-scoped runner app. Caddy runs as numeric non-root user `568:568`, listens on HTTP port 8080 inside a bridge-network container, and sees the generated site and its own configuration through read-only bind mounts. TrueNAS publishes one operator-selected host port. The deployment runner is isolated from Caddy and receives write access only to `site/` plus its own state.
 
-Default installation is LAN-only. The live deployment additionally uses a Cloudflare Tunnel and a self-hosted Cloudflare Access application restricted to the owner's identity. Never create a public route without tested, fail-closed authentication, and never create a router port-forward.
+Default installation is LAN-only. The maintainer-tested deployment additionally uses a Cloudflare Tunnel and a self-hosted Cloudflare Access application restricted to approved identities. Never create a public route without tested, fail-closed authentication, and never create a router port-forward.
 
 ## Files and fixed contract
 
@@ -95,7 +95,7 @@ Do not create `current` as a directory. The publisher creates it as a relative s
 
 ## 2. Configure identities and permissions
 
-For the initial manual test, an administrator can copy and publish files. Caddy runs as `UID:GID 568:568`; it needs read/traverse access only. The Phase 7 runner uses the official image's `UID:GID 1001:1001`, with Modify access only to `site/` and its separate runner-state path; follow the [runner runbook](runner/README.md) rather than granting access to `config/` or the parent dataset.
+For the initial manual test, an administrator can copy and publish files. Caddy runs as `UID:GID 568:568`; it needs read/traverse access only. The optional dedicated runner uses the official image's `UID:GID 1001:1001`, with Modify access only to `site/` and its separate runner-state path; follow the [runner runbook](runner/README.md) rather than granting access to `config/` or the parent dataset.
 
 After copying the Caddyfile and publishing the first release, open **Datasets → apps → kitchook → Permissions → Edit ACL**:
 
@@ -106,7 +106,7 @@ After copying the Caddyfile and publishing the first release, open **Datasets �
 5. select **Apply permissions recursively** because this is a new, dedicated dataset containing only KitchooK files; and
 6. save, re-open the Permissions widget, and confirm no UID/GID 568 entry grants Modify.
 
-Do not recursively change an established parent dataset or unrelated child datasets. If a UID/GID 568 Modify entry is inherited from an Apps-preset parent and cannot be reduced cleanly on `kitchook`, stop and inspect the parent ACL rather than stripping ACLs or granting broad access. The Compose read-only mount is sufficient for a short smoke test, but record the ACL issue for correction before calling Phase 6 complete.
+Do not recursively change an established parent dataset or unrelated child datasets. If a UID/GID 568 Modify entry is inherited from an Apps-preset parent and cannot be reduced cleanly on `kitchook`, stop and inspect the parent ACL rather than stripping ACLs or granting broad access. The Compose read-only mount is sufficient for a short smoke test, but record and correct the ACL issue before accepting the deployment.
 
 Copy the repository configuration to the host and leave it non-writable by Caddy:
 
@@ -302,7 +302,7 @@ Until all live checks pass, record the precise pending checks and do not mark th
 
 ## Automated deployment, release switch, and rollback
 
-Provision the dedicated runner using [`runner/README.md`](runner/README.md). The unified workflow builds once on GitHub-hosted Ubuntu, then only for a successful, still-current `main` push downloads the same-run artifact on `[self-hosted, kitchook-deploy]`. The runner does not check out source, build, or install npm dependencies.
+Provision the dedicated runner using [`runner/README.md`](runner/README.md). In the maintainer-tested design, the private instance workflow builds once on GitHub-hosted Ubuntu, then only for a successful, still-current `main` push downloads the same-run artifact on `[self-hosted, kitchook-deploy]`. The public application repository deliberately has no workflow that can target this runner. The runner does not check out source, build, or install npm dependencies.
 
 `deploy-release.sh` publishes under the full commit SHA, confirms the relative selection, compares the LAN origin homepage/search/API bytes with the selected release using cache-busting requests, and restores and verifies the previous selection if the new content fails. Only after success does it retain five managed releases. A cleanup warning does not roll back an otherwise healthy deployment.
 
@@ -315,7 +315,7 @@ sh /path/to/select-release.sh "$OLD" "$SITE"
 readlink "$SITE/current"
 ```
 
-For migration, enroll the selected known-good Phase 6 baseline without selecting or modifying it:
+For migration, enroll the selected known-good pre-automation baseline without selecting or modifying it:
 
 ```sh
 sh /path/to/adopt-release.sh <baseline-release-id> "$SITE"

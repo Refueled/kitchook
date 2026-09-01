@@ -1,6 +1,6 @@
 # Dedicated KitchooK! deployment runner
 
-This package installs a persistent, repository-scoped GitHub Actions runner as a **separate TrueNAS Custom App from Caddy**. It receives only successful `main` deployment jobs, downloads the already-built `site` artifact, and writes immutable releases under the existing KitchooK! `site/` directory.
+This package installs a persistent, repository-scoped GitHub Actions runner as a **separate TrueNAS Custom App from Caddy**. It is designed for a private instance workflow that sends only successful `main` deployment jobs, downloads the already-built `site` artifact, and writes immutable releases under the existing KitchooK! `site/` directory. The public application repository deliberately contains no workflow that targets this runner.
 
 The runner is a code-execution boundary. A workflow committed to the repository can write anything exposed to this container. Keep the repository private, protect `main` and workflow changes, and do not broaden the mounts below.
 
@@ -38,7 +38,7 @@ The app has no published port, host network, Docker socket, privileged mode, add
 ## 1. Prerequisites
 
 - A private GitHub repository whose default branch is `main`.
-- The Phase 6 Caddy app and `site/releases` plus relative `site/current` layout.
+- The Caddy app and `site/releases` plus relative `site/current` layout from the parent [operator runbook](../README.md).
 - TrueNAS **Install via YAML** support.
 - A dedicated repository runner registration token. GitHub displays this token under **Repository Settings → Actions → Runners → New self-hosted runner**; it expires after one hour.
 - A direct LAN origin such as `http://192.0.2.10:15000`. Do not use the Cloudflare Access hostname: the runner stores no Access credentials.
@@ -83,9 +83,9 @@ Apply the equivalent TrueNAS ACLs:
 5. UID 1001 cannot write `kitchook/config/`, the `kitchook` parent, sibling apps, media, backups, or home directories; and
 6. operations files remain root-owned and non-writable by UID 1001.
 
-Do not mount a checkout as operations. Copy the reviewed helper files from a trusted `main` revision. Do not expose any of these application paths over SMB/NFS and do not disable TrueNAS Host Path safety checks.
+Do not mount a checkout as operations. Copy the reviewed helper files from a pinned source release or commit. Do not expose any of these application paths over SMB/NFS and do not disable TrueNAS Host Path safety checks.
 
-After migration acceptance, remove the old Phase 6 interactive publisher's Modify ACL if unattended deployment fully replaces it. Retain it only if manual publication remains an explicit operating requirement.
+After migration acceptance, remove the old interactive publisher's Modify ACL if unattended deployment fully replaces it. Retain it only if manual publication remains an explicit operating requirement.
 
 ## 3. Render and install the app
 
@@ -95,7 +95,7 @@ Copy [`compose.yml`](compose.yml) and replace every placeholder:
 - `https://github.com/OWNER/REPOSITORY`;
 - runner name, if desired;
 - the one-hour `RUNNER_REGISTRATION_TOKEN` value; and
-- `http://TRUENAS_LAN_IP:HOST_PORT` with the direct Phase 6 LAN origin.
+- `http://TRUENAS_LAN_IP:HOST_PORT` with the direct Caddy LAN origin.
 
 Keep `RUNNER_LABELS: kitchook-deploy` and retention `"5"` unless the workflow is deliberately changed to the same new label/count. Review the rendered YAML: it must still have three mounts, no `ports`, and no `/var/run/docker.sock`.
 
@@ -120,7 +120,7 @@ Confirm both boundaries:
 
 The entrypoint unsets the variable before the listener starts even on first boot, but removing it from the app definition also removes it from stored container configuration.
 
-## 4. Migrate the Phase 6 baseline
+## 4. Migrate an existing baseline
 
 Inventory before deleting anything:
 
@@ -130,7 +130,7 @@ readlink "$SITE/current"
 find "$SITE/releases" -mindepth 1 -maxdepth 1 -type d -print
 ```
 
-Identify the selected, known-good Phase 6 baseline. Validate and enroll it without changing its files or selection, running as UID 1001 through an app shell or equivalent scoped identity:
+Identify the selected, known-good pre-automation baseline. Validate and enroll it without changing its files or selection, running as UID 1001 through an app shell or equivalent scoped identity:
 
 ```sh
 /opt/kitchook/adopt-release.sh <baseline-release-id> /srv/site
@@ -138,16 +138,24 @@ Identify the selected, known-good Phase 6 baseline. Validate and enroll it witho
 
 The baseline becomes the first line of `/srv/site/.kitchook-deploy/releases` and counts toward five-release retention. Adoption never infers ownership from a directory name and never modifies release content.
 
-Keep acceptance/test releases unmanaged during the first unattended deployment and rollback test. After owner-confirmed Phase 7 acceptance, explicitly delete obsolete, distinguishable Phase 6 test directories administratively. Automation never removes unmanaged directories.
+Keep acceptance and test releases unmanaged during the first unattended deployment and rollback test. After that deployment passes acceptance, explicitly delete obsolete, distinguishable pre-automation test directories administratively. Automation never removes unmanaged directories.
 
 ## 5. First deployment and acceptance
 
-The repository workflow targets only `[self-hosted, kitchook-deploy]` after a successful same-run `main` build. It does not check out source or install dependencies on this runner.
+The owner-reviewed workflow in the private instance repository should target only `[self-hosted, kitchook-deploy]` after a successful same-run `main` build. It must not check out source or install dependencies on this runner. Start from the [GitHub-hosted artifact workflow](../../docs/github-actions.md), then keep the self-hosted publication job private and limited to downloading that same-run artifact, rejecting a stale commit that is no longer current on `main`, and invoking:
+
+```sh
+/opt/kitchook/deploy-release.sh \
+  "$RUNNER_TEMP/site" "$GITHUB_SHA" \
+  "$KITCHOOK_SITE_ROOT" "$KITCHOOK_ORIGIN_URL" "$KITCHOOK_RETAIN_RELEASES"
+```
+
+The artifact must be downloaded directly into `$RUNNER_TEMP/site` before this call. The environment values come from the reviewed runner app configuration.
 
 Push or merge a distinguishable change to `main`, then verify:
 
-1. `validate` builds once and uploads artifact `site`;
-2. `deploy` waits for the dedicated runner and passes the current-`main` stale-SHA check;
+1. the GitHub-hosted build job builds once and uploads artifact `site`;
+2. the publication job waits for the dedicated runner and rejects a stale commit that is no longer current on `main`;
 3. `site/current` equals `releases/<full-40-character-commit-sha>`;
 4. the LAN origin and authenticated remote hostname serve the distinguishable content;
 5. Caddy was not restarted or replaced;

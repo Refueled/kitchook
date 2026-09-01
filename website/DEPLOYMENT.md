@@ -4,12 +4,12 @@
 
 ## Cloudflare Pages setup
 
-Create two **Direct Upload** Cloudflare Pages projects before enabling the workflows:
+The deployment uses two **Direct Upload** Cloudflare Pages projects:
 
 - `kitchook-com` for `https://kitchook.com` and `https://www.kitchook.com`;
 - `demo-kitchook-com` for `https://demo.kitchook.com`.
 
-Set `main` as each project's production branch. In Cloudflare DNS, create proxied CNAME records for the custom domains using the target Pages project domains shown by Cloudflare. Cloudflare provisions and renews HTTPS certificates after DNS validation.
+To recreate the setup, set `main` as each project's production branch. In Cloudflare DNS, create proxied CNAME records for the custom domains using the target Pages project domains shown by Cloudflare. Cloudflare provisions and renews HTTPS certificates after DNS validation.
 
 Create a Cloudflare API token limited to **Account → Cloudflare Pages → Edit** for these two projects only. Store it as the `CLOUDFLARE_API_TOKEN` GitHub Actions secret and store the account ID as `CLOUDFLARE_ACCOUNT_ID`. Do not reuse a token that can manage DNS, Workers, R2, or any owner-instance infrastructure.
 

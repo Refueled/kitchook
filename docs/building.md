@@ -9,6 +9,7 @@ Use this path when you want to develop KitchooK! or build from a checked-out, pi
 ```sh
 git clone https://github.com/Refueled/kitchook.git
 cd kitchook
+git checkout v0.1.3
 npm ci --ignore-scripts
 npm test
 KITCHOOK_CONTENT_DIR=/absolute/path/to/my-cookbook npm run build
@@ -47,6 +48,7 @@ Serve the contents of the output directory directly. A successful build includes
 
 ```text
 index.html
+404.html
 recipes/
 search/index.json
 api/recipes.json
