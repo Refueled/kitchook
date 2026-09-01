@@ -1,6 +1,6 @@
 # TrueNAS static serving and automated deployment
 
-> **Status:** Phase 6 serving and Phase 7 dedicated-runner deployment passed live acceptance on TrueNAS 25.04.2.6.
+> **Validation status:** Static serving and dedicated-runner deployment passed live acceptance on TrueNAS 25.04.2.6.
 
 This package serves KitchooK! as static files on TrueNAS Community Edition 25.04.2.6 and publishes successful `main` builds through a separate, repository-scoped runner app. Caddy runs as numeric non-root user `568:568`, listens on HTTP port 8080 inside a bridge-network container, and sees the generated site and its own configuration through read-only bind mounts. TrueNAS publishes one operator-selected host port. The deployment runner is isolated from Caddy and receives write access only to `site/` plus its own state.
 
@@ -296,9 +296,9 @@ Finally:
 1. restart the app and verify the same release returns;
 2. stop and recreate/replace the app from the rendered YAML and verify files and `current` persist;
 3. either verify there is no Cloudflare route, or verify every configured hostname is protected by tested, fail-closed Cloudflare Access (or equivalent); in all cases confirm there is no router/firewall port-forward; and
-4. record the tested TrueNAS version, host port, client devices, restart result, replacement result, write-denial result, and remote-access posture in `PROJECT_PLAN.md`.
+4. record the tested TrueNAS version, host port, client devices, restart result, replacement result, write-denial result, and remote-access posture in the instance's private operational records.
 
-Until all live checks pass, describe the precise pending checks rather than marking Phase 6 complete.
+Until all live checks pass, record the precise pending checks and do not mark the deployment as accepted.
 
 ## Automated deployment, release switch, and rollback
 
