@@ -4,6 +4,8 @@ All notable user-visible changes to KitchooK! are documented here. The project f
 
 ## Unreleased
 
+## 0.1.4 — 2026-09-01
+
 ### Added
 
 - Public contribution, security-reporting, ownership, and issue-management controls.
@@ -56,7 +58,8 @@ All notable user-visible changes to KitchooK! are documented here. The project f
 - Versioned multi-platform OCI builder for `linux/amd64` and `linux/arm64`.
 - External cookbook input, validated instance configuration, and portable static-output contracts.
 
-[Unreleased]: https://github.com/Refueled/kitchook/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/Refueled/kitchook/compare/v0.1.4...HEAD
+[0.1.4]: https://github.com/Refueled/kitchook/releases/tag/v0.1.4
 [0.1.3]: https://github.com/Refueled/kitchook/releases/tag/v0.1.3
 [0.1.2]: https://github.com/Refueled/kitchook/releases/tag/v0.1.2
 [0.1.1]: https://github.com/Refueled/kitchook/releases/tag/v0.1.1
