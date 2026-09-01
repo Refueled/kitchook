@@ -285,6 +285,15 @@ test('KitchooK! wordmarks preserve the coral exclamation mark', async () => {
   assert.match(styles, /\.wordmark__mark \{\s+color: var\(--coral\);/);
 });
 
+test('not-found panel keeps dark text on its yellow background', async () => {
+  const styles = await readFile(path.join(repositoryRoot, 'src', 'styles', 'global.css'), 'utf8');
+
+  assert.match(
+    styles,
+    /\.not-found__content \{[^}]*background: var\(--yellow\);[^}]*color: var\(--accent-ink\);/s,
+  );
+});
+
 test('footer exposes and copies the build deployment identifier', async () => {
   const workflow = await readFile(path.join(repositoryRoot, '.github', 'workflows', 'ci.yml'), 'utf8');
   const layout = await readFile(path.join(repositoryRoot, 'src', 'layouts', 'BaseLayout.astro'), 'utf8');
