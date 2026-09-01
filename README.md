@@ -2,7 +2,7 @@
 
 KitchooK! turns Markdown recipes and photos into a fast, searchable static cookbook. Your recipes remain ordinary files, while the built site can be served without an application server or database.
 
-[Documentation](https://kitchook.com/docs/introduction/) · [Live demo](https://demo.kitchook.com) · [Quick start](https://kitchook.com/docs/introduction/quick-start/)
+[Documentation](https://kitchook.com/docs/introduction/) · [Live demo](https://demo.kitchook.com) · [Quick start](https://kitchook.com/docs/introduction/quick-start/) · [Releases](https://github.com/Refueled/kitchook/releases)
 
 ## What it does
 
@@ -52,5 +52,7 @@ npm run build
 ```
 
 `npm run dev` starts the cookbook development server. The documentation website is maintained separately under [`website/`](website/).
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) to propose changes, [SECURITY.md](SECURITY.md) to report vulnerabilities privately, and [CHANGELOG.md](CHANGELOG.md) for release history.
 
 KitchooK! is available under the [MIT License](LICENSE).
