@@ -13,7 +13,7 @@ sudo chown 1000:1000 output
 docker run --rm \
   -v "$PWD/my-cookbook:/input:ro" \
   -v "$PWD/output:/output:rw" \
-  ghcr.io/refueled/kitchook:0.1.3@sha256:ea97b19f4634941eacbe83a05324f6497dc577cc48736b939fc696d08eac278b
+  ghcr.io/refueled/kitchook:0.1.4@sha256:079e6388159c529f21bb4c9e7152eddcfcd6ea69be68aaf07a9adf4be7b7728c
 ```
 
 The version and digest select the exact published image. When you upgrade, change both using the values from that release.

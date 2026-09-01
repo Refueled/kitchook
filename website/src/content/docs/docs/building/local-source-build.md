@@ -8,7 +8,7 @@ Clone the public repository and check out the version you intend to use:
 ```sh
 git clone https://github.com/Refueled/kitchook.git
 cd kitchook
-git checkout v0.1.3
+git checkout v0.1.4
 npm ci --ignore-scripts
 npm test
 KITCHOOK_CONTENT_DIR=/absolute/path/to/my-cookbook npm run build

@@ -10,7 +10,7 @@ KitchooK! treats your recipe folder as input and does not write to it during a b
 Pin both the release version and its immutable image digest. The current builder reference is:
 
 ```text
-ghcr.io/refueled/kitchook:0.1.3@sha256:ea97b19f4634941eacbe83a05324f6497dc577cc48736b939fc696d08eac278b
+ghcr.io/refueled/kitchook:0.1.4@sha256:079e6388159c529f21bb4c9e7152eddcfcd6ea69be68aaf07a9adf4be7b7728c
 ```
 
 To upgrade, select the version and matching digest from the [GitHub releases](https://github.com/Refueled/kitchook/releases), change both together, build the unchanged collection in a test location, and check the homepage, a recipe, search, and `/api/recipes.json` before publishing it.

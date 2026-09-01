@@ -17,7 +17,7 @@ Clone the repository, check out the release you intend to use, and run:
 ```sh
 git clone https://github.com/Refueled/kitchook.git
 cd kitchook
-git checkout v0.1.3
+git checkout v0.1.4
 npm ci --ignore-scripts
 npm test
 npm run build
