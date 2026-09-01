@@ -273,6 +273,7 @@ button {
   padding: clamp(1.5rem, 5vw, 3rem);
   background: var(--yellow);
   box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--shadow);
+  color: var(--accent-ink);
 }
 
 .not-found__content h1 {

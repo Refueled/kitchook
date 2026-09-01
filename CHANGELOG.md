@@ -13,6 +13,10 @@ All notable user-visible changes to KitchooK! are documented here. The project f
 
 - Refreshed public build, deployment, and operator documentation after launch and documented the generated `404.html` output.
 
+### Fixed
+
+- Kept the yellow 404 panel text dark and readable in dark mode.
+
 ## 0.1.3 — 2026-08-31
 
 ### Added
