@@ -29,13 +29,14 @@ The repository currently contains five intentional example recipes: three active
 
 ## Current handoff status
 
-**Completed:** Phases 0 through 5. **Next:** Phase 6 — public-project hardening and launch.
+**Completed:** Phases 0 through 5. **In progress:** Phase 6 — the source repository launched publicly on 2026-09-01; only the manual GitHub social-preview upload remains.
 
+- The public repository now has contribution and security policies, issue and pull-request templates, `CODEOWNERS`, required GitHub-hosted checks and owner review, restricted SHA-pinned Actions, secret scanning with push protection, public metadata, and GitHub Private Vulnerability Reporting.
 - The current public builder release is [`v0.1.3`](docs/releases.md), published at `ghcr.io/refueled/kitchook:0.1.3@sha256:ea97b19f4634941eacbe83a05324f6497dc577cc48736b939fc696d08eac278b`. The GHCR package is publicly readable and was consumed successfully by a disposable private clean-room repository on a fresh GitHub-hosted runner.
 - The private owner instance deliberately remains pinned to `v0.1.2`; its upgrade built, published, and origin-verified the same-run artifact under immutable release ID `8fdf888ce042f8acee4da681c2173ea1f5fb007a`. The selected production artifact remains independent of either repository.
 - `kitchook.com` and `demo.kitchook.com` are public Cloudflare Pages artifacts deployed only from GitHub-hosted runners. Public validation covered homepage, quick start, recipe route, search, API, 404, immutable fingerprinted-asset caching, HTTPS, and the `www`-to-apex redirect.
 - Phase 4 documentation has been exercised through source and OCI builds, ordinary static hosting, Caddy, and private S3/CloudFront. The S3/CloudFront guide requires the documented viewer-request directory-index function and restricted missing-object lookup permission; these are not optional when using a private S3 REST origin.
-- No Phase 3, Phase 4, or Phase 5 acceptance work remains. Do not treat this status as approval to make the source repository public: Phase 6 public-project controls, final review, and launch work remain outstanding.
+- No Phase 3, Phase 4, or Phase 5 acceptance work remains. Phase 6 functional and security launch work is complete; upload `website/public/social-card.png` through GitHub's repository settings to finish the remaining presentation task.
 
 ---
 
@@ -469,7 +470,7 @@ Cloudflare Pages Direct Upload projects now publish the independently built webs
 
 ## Phase 6 — Public-project hardening and launch
 
-**Status: Not started.**
+**Status: In progress (public launch and security controls complete 2026-09-01; manual GitHub social-preview upload remains).**
 
 Deliverables:
 
