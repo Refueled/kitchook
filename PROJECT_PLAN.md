@@ -634,14 +634,14 @@ If builder publication requires temporary sequencing changes, Caddy may continue
 
 These decisions are intentionally bounded and must be recorded before their relevant phase is accepted:
 
-1. the private owner-instance repository name;
+1. **Resolved (Phase 3):** the owner-instance repository name and location remain in private operational records; the public contract does not depend on or disclose them.
 2. **Resolved (Phase 2):** `ghcr.io/refueled/kitchook`, publishing `linux/amd64` and `linux/arm64`.
 3. **Resolved (Phase 2):** `0.1.0` is the initial distribution release.
 4. **Resolved (Phase 1):** `instance.config.json` at the selected content-directory root; required non-blank `title` and `description`, plus optional origin-only `canonicalOrigin`. The content directory contains both this file and `recipes/` and is selected with `KITCHOOK_CONTENT_DIR` (default: repository root). Deployment identifiers remain deployment metadata.
-5. whether `website/` remains in this repository or receives a demonstrated reason for separation;
-6. the hosting provider for `kitchook.com`;
-7. whether a live demo uses a subdomain or a route within the documentation site; and
-8. whether subpath cookbook hosting belongs in a later compatibility release.
+5. **Resolved (Phase 5):** `website/` remains an independent package in this repository; no operational need justified a separate repository.
+6. **Resolved (Phase 5):** Cloudflare Pages hosts `kitchook.com` through GitHub-hosted Direct Upload automation.
+7. **Resolved (Phase 5):** the live public example uses the `demo.kitchook.com` subdomain.
+8. **Resolved (Phase 1):** cookbook hosting remains root-origin-only; subpath support is deferred to a future compatibility release if it can satisfy every route, asset, search, API, and browser-interaction contract.
 
 These are not invitations to revisit the static-first architecture.
 
