@@ -9,6 +9,10 @@ All notable user-visible changes to KitchooK! are documented here. The project f
 - Public contribution, security-reporting, ownership, and issue-management controls.
 - Three additional published example recipes and AI-generated imagery for every active bundled recipe.
 
+### Changed
+
+- Refreshed public build, deployment, and operator documentation after launch and documented the generated `404.html` output.
+
 ## 0.1.3 — 2026-08-31
 
 ### Added

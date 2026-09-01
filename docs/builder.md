@@ -51,7 +51,7 @@ docker run --rm \
 
 The initialization command is the only root process; the builder remains unprivileged. Mount `kitchook-output` read-only into a static-server container or copy its files out after the build.
 
-It builds and verifies in a private staging directory before publication. A malformed collection exits nonzero before replacing a pre-existing output artifact. On success, `/output` directly contains `index.html`, `recipes/`, `search/index.json`, `api/recipes.json`, and `_astro/`.
+It builds and verifies in a private staging directory before publication. A malformed collection exits nonzero before replacing a pre-existing output artifact. On success, `/output` directly contains `index.html`, `404.html`, `recipes/`, `search/index.json`, `api/recipes.json`, and `_astro/`.
 
 ## Local image development
 

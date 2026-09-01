@@ -21,3 +21,5 @@ The version and digest select the exact published image. When you upgrade, chang
 The builder creates and verifies the site in a staging directory. If recipe validation fails, it exits without replacing files already in `/output`. On success, it replaces `/output` with the completed site.
 
 The image supports Linux AMD64 and ARM64 systems, including common x86 servers, Raspberry Pi, and Apple Silicon Docker environments.
+
+Docker Desktop and Colima may not map bind-mount ownership to UID 1000. If `/output` remains unwritable after `chown`, use the named-volume procedure in the [complete builder guide](https://github.com/Refueled/kitchook/blob/main/docs/builder.md#build-a-cookbook).

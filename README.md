@@ -51,7 +51,7 @@ npm test
 npm run build
 ```
 
-`npm run dev` starts the cookbook development server. The documentation website is maintained separately under [`website/`](website/).
+`npm run dev` starts the cookbook development server. The documentation website is an independent package under [`website/`](website/).
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) to propose changes, [SECURITY.md](SECURITY.md) to report vulnerabilities privately, and [CHANGELOG.md](CHANGELOG.md) for release history.
 

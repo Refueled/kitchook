@@ -15,6 +15,7 @@ The output folder contains at least:
 
 ```text
 index.html
+404.html
 recipes/
 search/index.json
 api/recipes.json

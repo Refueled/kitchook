@@ -13,7 +13,7 @@ Pin both the release version and its immutable image digest. The current builder
 ghcr.io/refueled/kitchook:0.1.3@sha256:ea97b19f4634941eacbe83a05324f6497dc577cc48736b939fc696d08eac278b
 ```
 
-To upgrade, change the version and matching digest together, build the unchanged collection in a test location, and check the homepage, a recipe, search, and `/api/recipes.json` before publishing it.
+To upgrade, select the version and matching digest from the [GitHub releases](https://github.com/Refueled/kitchook/releases), change both together, build the unchanged collection in a test location, and check the homepage, a recipe, search, and `/api/recipes.json` before publishing it.
 
 ### Roll back the built site
 

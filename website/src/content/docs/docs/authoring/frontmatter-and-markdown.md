@@ -25,4 +25,4 @@ Headings, bullet lists, numbered steps, links, and ordinary Markdown text are re
 
 If a required field is missing or invalid, the build stops and identifies the affected recipe. KitchooK! checks the supported fields and values; it does not proofread the recipe or require specific Ingredients and Instructions headings.
 
-Supported optional fields are `description`, `aliases`, `tags`, `categories`, `cuisine`, `meal`, `prep_minutes`, `cook_minutes`, `total_minutes`, `servings`, `difficulty`, `favorite`, `image`, `source`, `created`, `updated`, and `status`.
+Supported optional fields are `description`, `aliases`, `tags`, `categories`, `cuisine`, `meal`, `prep_minutes`, `cook_minutes`, `total_minutes`, `servings`, `difficulty`, `favorite`, `image`, `source`, `created`, `updated`, and `status`. See the [complete authoring reference](https://github.com/Refueled/kitchook/blob/main/docs/authoring.md#frontmatter-reference) for accepted values, defaults, and field shapes.

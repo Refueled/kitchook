@@ -3,9 +3,7 @@ title: Quick start
 description: Build the examples or your own recipe collection.
 ---
 
-## Current source status
-
-The source repository is still private while the public contribution and security controls are completed. You can view the [live demo](https://demo.kitchook.com) now or use the public [builder container](/docs/building/builder-container/) with your own recipe folder. The source-build steps below will work after the repository opens.
+View the [live demo](https://demo.kitchook.com), build the bundled examples from the public source, or use the [builder container](/docs/building/builder-container/) with your own recipe folder.
 
 ## Source-build requirements
 
@@ -14,7 +12,7 @@ The source repository is still private while the public contribution and securit
 
 ## Build the example recipes
 
-Once the public source release is available, check out the release you intend to use and run:
+Clone the repository, check out the release you intend to use, and run:
 
 ```sh
 git clone https://github.com/Refueled/kitchook.git

@@ -13,4 +13,4 @@ If GitHub Actions publishes to a self-hosted runner on the home network:
 - Use it only to download and publish an already-built artifact.
 - Give it write access only to the site release area, not to Caddy configuration or unrelated storage.
 
-The deployment package and complete TrueNAS/Caddy runbook will be available with the public source repository. Until then, treat this page as an overview rather than a complete installation guide.
+Follow the public [TrueNAS/Caddy operator runbook](https://github.com/Refueled/kitchook/blob/main/infrastructure/README.md) for dataset permissions, static serving, immutable releases, validation, rollback, and the optional dedicated-runner setup.
