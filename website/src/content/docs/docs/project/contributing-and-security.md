@@ -1,15 +1,14 @@
 ---
 title: Contributing and security
-description: Current status of public contributions and vulnerability reporting.
+description: How to contribute changes and report vulnerabilities privately.
 ---
 
-The KitchooK! source repository is still private while its public-project controls are completed. Public issues and pull requests are not open yet.
+Contributions to KitchooK! are welcome. Start with the repository's [contribution guide](https://github.com/Refueled/kitchook/blob/main/CONTRIBUTING.md), search existing issues, and use the issue templates for reproducible bugs or focused feature proposals.
 
-Before the repository opens, the project will publish:
+A pull request should remain focused, include tests for behavior changes, update user documentation and the changelog where appropriate, and pass the cookbook and website checks. Changes to workflows, dependencies, builder code, contracts, and deployment infrastructure require maintainer review. Pull-request checks use GitHub-hosted runners and cannot access owner-instance infrastructure.
 
-- contribution instructions and issue and pull-request templates;
-- a security policy with a working private reporting route;
-- ownership rules for workflows, dependencies, builder code, and deployment files; and
-- the required branch checks for outside contributions.
+### Report vulnerabilities privately
 
-There is not yet a public security contact. Do not disclose vulnerability details through a public channel; this page will be updated with a private reporting route before the repository opens.
+Do not disclose a suspected vulnerability in an issue, pull request, or other public channel. Read the [security policy](https://github.com/Refueled/kitchook/security/policy), then submit the report through [GitHub Private Vulnerability Reporting](https://github.com/Refueled/kitchook/security/advisories/new).
+
+Include the affected source or builder version and digest, reproduction steps, likely impact, and a suggested mitigation when possible. The current support window and response expectations are maintained in the security policy.

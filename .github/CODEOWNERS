@@ -1,0 +1,17 @@
+# Default ownership keeps every contribution reviewable by the maintainer.
+* @Refueled
+
+# Security-sensitive project controls.
+/.github/ @Refueled
+/package.json @Refueled
+/package-lock.json @Refueled
+/website/package.json @Refueled
+/website/package-lock.json @Refueled
+/Dockerfile @Refueled
+/infrastructure/ @Refueled
+/scripts/ @Refueled
+/src/content.config.ts @Refueled
+/src/lib/ @Refueled
+/docs/contracts.md @Refueled
+/docs/releases.md @Refueled
+/SECURITY.md @Refueled
