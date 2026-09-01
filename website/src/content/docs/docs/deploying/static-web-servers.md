@@ -1,10 +1,15 @@
 ---
 title: Static web servers
-description: Serve the completed output from any ordinary document root.
+description: Host the built site with Caddy, Nginx, Apache, or another compatible static host.
 ---
 
-Build first, then copy the **contents** of `dist/` to a static document root. Caddy, nginx, Apache, and equivalent static-file servers work. The host must serve directory indexes and ordinary files; it does not need Node.js, Astro, recipe Markdown, or a database.
+Copy the **contents** of `dist/` directly into the web root. The root should contain `index.html`, `recipes/`, `search/`, `api/`, and `_astro/`.
 
-Verify the homepage, a recipe route, `search/index.json`, and `api/recipes.json` through the public origin after every deployment. Configure a real 404 response and cache fingerprinted `_astro/` assets aggressively while keeping HTML revalidatable.
+A compatible host must serve directory indexes, preserve root-relative URLs, serve ordinary HTML, JavaScript, JSON, and image files, and return a real 404 for missing paths. It does not need Node.js, a database, or an application backend. KitchooK! currently supports only the root of a domain or subdomain, not a subpath.
 
-See the [generic deployment guide](https://github.com/Refueled/kitchook/blob/main/docs/deploying.md) for Caddy, caching, and verification guidance.
+### Deployment checks
+
+- Open the homepage and a recipe URL.
+- Run a search and fetch `/api/recipes.json`.
+- Confirm a nonexistent URL returns 404 rather than the homepage.
+- Cache fingerprinted files under `/_astro/` for a long time, but keep HTML, search data, and JSON revalidatable so updates appear promptly.

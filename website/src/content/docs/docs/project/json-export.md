@@ -1,10 +1,14 @@
 ---
 title: JSON export
-description: A static, build-time recipe API.
+description: A static, build-time JSON feed of published recipes.
 ---
 
-Every cookbook build writes `api/recipes.json`. It is a static export generated from the same validated collection used for the HTML routes and search index. There is no runtime API service.
+Each successful build writes `api/recipes.json` beside the HTML pages. It is an ordinary static JSON file, not a backend API service.
 
-Consumers may fetch the export from the static host when they need structured recipe data. Existing compatibility is additive: fields are not removed or reinterpreted without an explicit policy change and migration decision.
+The export contains every **active** recipe in stable title order. Draft and archived recipes are excluded, so this file is not a complete backup of the source collection.
 
-The authoritative field contract and verification behavior live in the [JSON export documentation](https://github.com/Refueled/kitchook/blob/main/docs/contracts.md).
+Scripts and integrations can fetch the file to read recipe titles, URLs, Markdown bodies, ingredients, supported metadata, and generated image details. Optional fields are omitted when they have no value.
+
+The current compatibility policy is additive: consumers should ignore fields they do not recognize. A breaking change requires an explicit migration decision and an appropriate semantic-version change.
+
+The exported fields are `slug`, `url`, `title`, `body`, and optional `description`, `aliases`, `tags`, `categories`, `cuisine`, `meal`, `ingredients`, `prepMinutes`, `cookMinutes`, `totalMinutes`, `servings`, `difficulty`, `favorite`, `source`, `created`, `updated`, and `image`.

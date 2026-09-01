@@ -1,12 +1,20 @@
 ---
 title: Upgrades and rollback
-description: Keep the builder and recipes independently versioned.
+description: Update the builder separately from your recipes and retain a previous site.
 ---
 
-Pin the selected KitchooK! release, preferably by OCI digest, in the private repository that owns your recipes. A recipe change builds with the current pin; an application upgrade is an explicit pin update followed by validation.
+KitchooK! treats your recipe folder as input and does not write to it during a build. The Docker example also mounts that folder read-only. Keep normal backups anyway; no build tool should be the only protection for your source files.
 
-Semantic releases identify compatible builder versions. Schema or static-output contract changes require a documented migration and a major-version decision. The JSON export policy is additive unless explicitly revised.
+### Upgrade the builder
 
-Keep a completed static artifact for each deployment. Roll back by selecting a previously verified artifact, not by rebuilding old source. This allows a recovery even if source control or build automation is temporarily unavailable.
+Pin both the release version and its immutable image digest. The current builder reference is:
 
-See [releases and compatibility](https://github.com/Refueled/kitchook/blob/main/docs/releases.md).
+```text
+ghcr.io/refueled/kitchook:0.1.3@sha256:ea97b19f4634941eacbe83a05324f6497dc577cc48736b939fc696d08eac278b
+```
+
+To upgrade, change the version and matching digest together, build the unchanged collection in a test location, and check the homepage, a recipe, search, and `/api/recipes.json` before publishing it.
+
+### Roll back the built site
+
+Keep the previous verified output until the new deployment has been checked through the real host. If the new site has a problem, restore or reselect that prior output using the host's normal rollback mechanism. This does not require rebuilding the old recipes, though a CDN may need invalidation before visitors see the restored files.

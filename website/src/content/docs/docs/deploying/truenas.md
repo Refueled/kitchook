@@ -1,10 +1,16 @@
 ---
-title: TrueNAS advanced deployment
-description: An owner-tested option for immutable static releases.
+title: TrueNAS and Caddy deployment
+description: The tested home-server deployment pattern.
 ---
 
-TrueNAS and Caddy are optional deployment choices, not KitchooK! requirements. The advanced profile publishes one completed artifact to an immutable release directory, verifies bytes through the origin, and changes a small selection pointer to roll back without rebuilding.
+The included homelab setup is tested with TrueNAS Community Edition 25.04.2.6 and Caddy. Other NAS systems or web servers may support a similar design, but they are not covered by the tested runbook.
 
-It uses a repository-scoped self-hosted runner only for final publication. Public pull requests must never be able to schedule work there. Keep all runner registration, production storage, Caddy paths, and credentials in a private instance repository.
+Each completed build is stored in a versioned release folder. A relative `current` symlink selects the release Caddy serves. Keeping the parent folder mounted lets an operator switch that symlink to a previously verified release without rebuilding the site or restarting Caddy.
 
-The full hardened runbook is maintained with the source [infrastructure documentation](https://github.com/Refueled/kitchook/tree/main/infrastructure).
+If GitHub Actions publishes to a self-hosted runner on the home network:
+
+- Attach the runner only to the private recipe repository, never a public fork.
+- Use it only to download and publish an already-built artifact.
+- Give it write access only to the site release area, not to Caddy configuration or unrelated storage.
+
+The deployment package and complete TrueNAS/Caddy runbook will be available with the public source repository. Until then, treat this page as an overview rather than a complete installation guide.

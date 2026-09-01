@@ -1,9 +1,9 @@
 ---
 title: Recipes and images
-description: Keep a recipe and its assets together.
+description: How to arrange recipe folders and photos.
 ---
 
-A content directory contains `instance.config.json` and a `recipes/` directory. Each recipe uses a lowercase kebab-case directory slug and a `recipe.md` file:
+Your cookbook folder contains `instance.config.json` and a `recipes/` directory. Each recipe lives directly below `recipes/` in a lowercase, hyphen-separated folder with a `recipe.md` file:
 
 ```text
 my-cookbook/
@@ -14,6 +14,8 @@ my-cookbook/
         └── finished-dish.jpg
 ```
 
-Colocate images with the recipe that uses them. KitchooK! validates image references during the build and writes optimized output assets. At least one recipe must be `active`; drafts and archives remain source content but are excluded from normal publication.
+Keep a recipe's image beside its `recipe.md` file and reference it through the frontmatter `image` field. During the build, KitchooK! verifies that this local image exists and is valid, then writes optimized image files for the site. It does not check every image URL written directly in the Markdown body.
 
-For the complete schema, image rules, statuses, and validation messages, read the [authoring reference](https://github.com/Refueled/kitchook/blob/main/docs/authoring.md).
+At least one recipe must be `active`, which is the default status. Active recipes appear on the site, in search, and in the JSON export. Recipes marked `draft` or `archived` remain in the source folder but are not published. Draft status is not access control, so keep the source folder private when it contains private material.
+
+See [Frontmatter and Markdown](/docs/authoring/frontmatter-and-markdown/) for the supported metadata fields.

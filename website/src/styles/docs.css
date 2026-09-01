@@ -10,6 +10,8 @@
 /* KitchooK! controls use deliberate square edges rather than Starlight’s defaults. */
 :where(site-search button, site-search kbd, .sidebar-content a, mobile-starlight-toc .toggle, .pagination-links a, .starlight-aside, .sl-link-button) { border-radius: 0 !important; }
 #starlight__search, #starlight__search * { border-radius: 0 !important; }
+site-search dialog { border-radius: 0 !important; }
+site-search dialog::backdrop { background-color: rgb(0 0 0 / 78%); -webkit-backdrop-filter: none; backdrop-filter: none; }
 
 /* Keep the mobile menu toggle visually aligned with the adjacent search icon. */
 starlight-menu-button button,

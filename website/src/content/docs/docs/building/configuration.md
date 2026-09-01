@@ -1,9 +1,9 @@
 ---
 title: Configuration
-description: The narrow instance configuration contract.
+description: Set up the instance.config.json file.
 ---
 
-Place `instance.config.json` at the root of the content directory:
+Place `instance.config.json` at the root of your cookbook folder:
 
 ```json
 {
@@ -13,8 +13,8 @@ Place `instance.config.json` at the root of the content directory:
 }
 ```
 
-`title` and `description` are required non-blank strings. `canonicalOrigin` is optional and, when set, must be an origin URL (for example, `https://recipes.example.com`), not a path.
+- **`title`** *(required)*: A non-blank title shown in the site header and navigation.
+- **`description`** *(required)*: A non-blank description used in page metadata.
+- **`canonicalOrigin`** *(optional)*: The `http` or `https` origin where the site is hosted, such as `https://recipes.example.com`. It cannot contain a path, query, fragment, username, or password.
 
-Configuration is for site identity and deployment-neutral values. Recipe fields belong in recipe frontmatter, and deployment IDs belong in deployment metadata. Invalid configuration stops the build with a useful error.
-
-Read the full [content and output contract](https://github.com/Refueled/kitchook/blob/main/docs/contracts.md).
+Unknown fields and invalid values stop the build with an error that names the configuration file. Recipe details such as times, ingredients, and tags belong in each recipe's Markdown frontmatter.

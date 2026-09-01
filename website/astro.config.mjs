@@ -15,12 +15,6 @@ export default defineConfig({
       components: {
         SiteTitle: './src/components/DocsSiteTitle.astro',
       },
-      social: [
-        { icon: 'github', label: 'GitHub', href: 'https://github.com/Refueled/kitchook' },
-      ],
-      editLink: {
-        baseUrl: 'https://github.com/Refueled/kitchook/edit/main/website/',
-      },
       sidebar: [
         {
           label: 'Introduction',
@@ -50,7 +44,7 @@ export default defineConfig({
           items: [
             { label: 'Static web servers', slug: 'docs/deploying/static-web-servers' },
             { label: 'Cloud hosting and automation', slug: 'docs/deploying/cloud-hosting-and-automation' },
-            { label: 'TrueNAS advanced deployment', slug: 'docs/deploying/truenas' },
+            { label: 'TrueNAS and Caddy deployment', slug: 'docs/deploying/truenas' },
           ],
         },
         {

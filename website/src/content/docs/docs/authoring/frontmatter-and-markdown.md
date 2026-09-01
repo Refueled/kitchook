@@ -1,9 +1,9 @@
 ---
 title: Frontmatter and Markdown
-description: Start with ordinary readable recipe files.
+description: Write readable Markdown recipes with a small metadata header.
 ---
 
-A minimal active recipe is ordinary Markdown with frontmatter:
+Each recipe is a Markdown file with a frontmatter header at the top:
 
 ```md
 ---
@@ -21,6 +21,8 @@ title: Garlic Butter Pasta
 2. Toss with melted butter.
 ```
 
-KitchooK! preserves the useful Markdown shape: headings, ingredient lists, and numbered instructions. Add supported metadata in frontmatter only when it improves the published recipe. Validation errors name the recipe and invalid field so malformed content fails before anything is deployed.
+Headings, bullet lists, numbered steps, links, and ordinary Markdown text are rendered on the recipe page. Frontmatter can add details such as prep time, servings, tags, difficulty, an image, source information, and publication status.
 
-See the [frontmatter reference](https://github.com/Refueled/kitchook/blob/main/docs/authoring.md) for all supported fields and Markdown conventions.
+If a required field is missing or invalid, the build stops and identifies the affected recipe. KitchooK! checks the supported fields and values; it does not proofread the recipe or require specific Ingredients and Instructions headings.
+
+Supported optional fields are `description`, `aliases`, `tags`, `categories`, `cuisine`, `meal`, `prep_minutes`, `cook_minutes`, `total_minutes`, `servings`, `difficulty`, `favorite`, `image`, `source`, `created`, `updated`, and `status`.

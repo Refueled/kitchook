@@ -1,17 +1,17 @@
 ---
 title: How static generation works
-description: The input, build, and output contract.
+description: From your recipe folder to a static website.
 ---
 
-A KitchooK! build has one job: turn content into static files.
+A KitchooK! build has one job: turn your Markdown recipes into web-ready static files.
 
 ```text
-recipes + instance.config.json → versioned builder → static site
+recipes/ + instance.config.json → KitchooK! builder → static site
 ```
 
-The builder reads Markdown, images, and a small instance configuration at build time. It validates the collection and creates homepage and recipe routes, a search index, and `api/recipes.json`. Browsers never fetch raw recipe Markdown from S3, Git, or another content service.
+During a build, KitchooK! reads your Markdown files, checks supported metadata and image references, optimizes referenced images, and generates HTML pages, a client-side search index, and an `api/recipes.json` data feed. Visitors receive pre-rendered pages, so the host never needs to process Markdown or query a database.
 
-The output root directly contains:
+The output folder contains at least:
 
 ```text
 index.html
@@ -21,6 +21,6 @@ api/recipes.json
 _astro/
 ```
 
-Copy the **contents** of that output directory to a static document root. The host needs no access to Node.js or the source recipes.
+Copy the **contents** of the output folder to the web root of a compatible static host. The host must serve directory indexes and ordinary files; it does not need Node.js, a database, or access to the original Markdown.
 
-KitchooK! initially supports origin-root hosting. Hosting a generated cookbook under a subpath is not supported.
+KitchooK! must be hosted at the root of a domain or subdomain, such as `recipes.example.com`. Hosting it below a path such as `example.com/recipes/` is not supported.

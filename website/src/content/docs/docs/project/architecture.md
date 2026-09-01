@@ -1,21 +1,23 @@
 ---
 title: Architecture
-description: Static-first by design.
+description: A small build tool with static output.
 ---
 
-KitchooK! separates public software from private content:
+KitchooK! reads a recipe folder and writes a separate static site:
 
 ```text
-public source + versioned builder
-             + private recipes/config
-             ↓
-      portable static artifact
-             ↓
-       any static host
+KitchooK! builder + recipes and config
+                  ↓
+          completed static files
+                  ↓
+          compatible static host
 ```
 
-All validation, rendering, image processing, search generation, and JSON export happen during a build. The production artifact is static and disposable; Markdown and images remain the canonical source.
+Validation, HTML rendering, referenced-image optimization, search indexing, and JSON export happen during the build. The generated files can be replaced and rebuilt; the Markdown and photos remain the source collection.
 
-This design means an application release never requires copying recipes into the public source repository, and changing a recipe does not require publishing KitchooK!.
+This separation means:
 
-Read the [full contracts](https://github.com/Refueled/kitchook/blob/main/docs/contracts.md) and the active [project plan](https://github.com/Refueled/kitchook/blob/main/PROJECT_PLAN.md).
+- A build does not write to the selected recipe folder.
+- Recipes can change without modifying KitchooK! source code.
+- The builder version can change without copying private recipes into the application repository.
+- The deployed host needs the completed files, not Node.js or the original Markdown.

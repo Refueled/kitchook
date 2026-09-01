@@ -1,10 +1,15 @@
 ---
 title: Contributing and security
-description: Safe boundaries for an open static-site builder.
+description: Current status of public contributions and vulnerability reporting.
 ---
 
-KitchooK! is preparing for public contributions. Until the formal contribution guide and security policy ship, please open ordinary product questions in the source repository and do not disclose vulnerabilities in public issues.
+The KitchooK! source repository is still private while its public-project controls are completed. Public issues and pull requests are not open yet.
 
-The project’s security boundary is deliberate: public workflows run on GitHub-hosted infrastructure; owner deployment runners, private recipes, and production storage are never available to public contributions. Dependency and workflow changes receive additional review because they affect the builder supply chain.
+Before the repository opens, the project will publish:
 
-The formal `CONTRIBUTING.md`, `SECURITY.md`, templates, and owner controls are part of the public-launch hardening work. Follow the [project plan](https://github.com/Refueled/kitchook/blob/main/PROJECT_PLAN.md) for current status.
+- contribution instructions and issue and pull-request templates;
+- a security policy with a working private reporting route;
+- ownership rules for workflows, dependencies, builder code, and deployment files; and
+- the required branch checks for outside contributions.
+
+There is not yet a public security contact. Do not disclose vulnerability details through a public channel; this page will be updated with a private reporting route before the repository opens.
