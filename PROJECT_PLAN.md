@@ -1,6 +1,6 @@
 # KitchooK! Distribution and Public Launch Plan
 
-> **Status:** Active roadmap
+> **Status:** Complete (2026-09-01)
 >
 > **Created:** 2026-08-30
 >
@@ -23,20 +23,20 @@ The current product already has the correct technical foundation for distributio
 - Caddy and TrueNAS are deployment choices rather than application requirements; and
 - the dedicated runner only publishes a completed artifact and is not part of the cookbook runtime.
 
-The repository currently contains five intentional example recipes: three active, one draft, and one archived. There are no private recipes to remove from repository history. This is therefore the appropriate point to establish a public software/private instance boundary before importing personal content.
+The public repository contains eight intentional example recipes: six active, one draft, and one archived. Their active-recipe imagery was generated for KitchooK! and is documented for redistribution. Personal content and deployment control remain in the separate private owner-instance repository.
 
 ---
 
 ## Current handoff status
 
-**Completed:** Phases 0 through 5. **In progress:** Phase 6 — the source repository launched publicly on 2026-09-01; only the manual GitHub social-preview upload remains.
+**Completed:** Phases 0 through 6. The source repository and documentation launched publicly on 2026-09-01.
 
 - The public repository now has contribution and security policies, issue and pull-request templates, `CODEOWNERS`, required GitHub-hosted checks and owner review, restricted SHA-pinned Actions, secret scanning with push protection, public metadata, and GitHub Private Vulnerability Reporting.
 - The current public builder release is [`v0.1.3`](docs/releases.md), published at `ghcr.io/refueled/kitchook:0.1.3@sha256:ea97b19f4634941eacbe83a05324f6497dc577cc48736b939fc696d08eac278b`. The GHCR package is publicly readable and was consumed successfully by a disposable private clean-room repository on a fresh GitHub-hosted runner.
 - The private owner instance deliberately remains pinned to `v0.1.2`; its upgrade built, published, and origin-verified the same-run artifact under immutable release ID `8fdf888ce042f8acee4da681c2173ea1f5fb007a`. The selected production artifact remains independent of either repository.
 - `kitchook.com` and `demo.kitchook.com` are public Cloudflare Pages artifacts deployed only from GitHub-hosted runners. Public validation covered homepage, quick start, recipe route, search, API, 404, immutable fingerprinted-asset caching, HTTPS, and the `www`-to-apex redirect.
 - Phase 4 documentation has been exercised through source and OCI builds, ordinary static hosting, Caddy, and private S3/CloudFront. The S3/CloudFront guide requires the documented viewer-request directory-index function and restricted missing-object lookup permission; these are not optional when using a private S3 REST origin.
-- No Phase 3, Phase 4, or Phase 5 acceptance work remains. Phase 6 functional and security launch work is complete; upload `website/public/social-card.png` through GitHub's repository settings to finish the remaining presentation task.
+- No roadmap acceptance work remains. The GitHub social preview uses `website/public/social-card.png`, and the redundant repository wiki is disabled so the documentation site and tracked Markdown remain authoritative.
 
 ---
 
@@ -470,7 +470,7 @@ Cloudflare Pages Direct Upload projects now publish the independently built webs
 
 ## Phase 6 — Public-project hardening and launch
 
-**Status: In progress (public launch and security controls complete 2026-09-01; manual GitHub social-preview upload remains).**
+**Status: Complete (2026-09-01).**
 
 Deliverables:
 
@@ -495,6 +495,10 @@ Acceptance:
 - release artifacts, image tags/digests, and source revisions correspond;
 - the owner's private instance continues deploying independently; and
 - disaster recovery remains possible from private recipes, a pinned public release, and the existing static-host configuration.
+
+### Phase 6 validation record
+
+The repository is publicly readable and clonable without authentication. Contribution controls, required GitHub-hosted checks, owner review, SHA-pinned approved Actions, least-privilege workflow permissions, secret scanning with push protection, and GitHub Private Vulnerability Reporting are active. Public checks confirmed the security policy, `v0.1.3` source release, matching GHCR manifest digest and architectures, six-recipe live demo, and clean secret-scanning and dependency-alert results. Example imagery was replaced with AI-generated project assets and its redistribution status is documented in `recipes/README.md`. The owner accepted retaining historical commit author metadata rather than invalidating published release tags, OCI provenance, and source revisions. Repository metadata, topics, and the custom social preview are set; the redundant GitHub wiki is disabled.
 
 ---
 
