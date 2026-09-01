@@ -17,7 +17,7 @@ Pin both a KitchooK! release tag and its immutable digest from the corresponding
 
 ## Workflow
 
-Create `.github/workflows/build.yml` in the private recipe repository. Replace `0.1.0` and `<release-digest>` together with the selected release values.
+Create `.github/workflows/build.yml` in the private recipe repository. The example uses the current `0.1.3` release and its matching digest; update both together when selecting another release.
 
 ```yaml
 name: Build cookbook
@@ -50,7 +50,7 @@ jobs:
           docker run --rm \
             -v "$GITHUB_WORKSPACE:/input:ro" \
             -v "$output:/output:rw" \
-            ghcr.io/refueled/kitchook:0.1.0@sha256:<release-digest>
+            ghcr.io/refueled/kitchook:0.1.3@sha256:ea97b19f4634941eacbe83a05324f6497dc577cc48736b939fc696d08eac278b
           test -s "$output/index.html"
           test -s "$output/search/index.json"
           test -s "$output/api/recipes.json"

@@ -10,10 +10,10 @@ The public image is:
 ghcr.io/refueled/kitchook
 ```
 
-The first distribution release is `0.1.0`. Releases use semantic versions and publish `linux/amd64` and `linux/arm64` manifests. Pin a production instance to both a version and the immutable digest recorded on its GitHub release:
+The first distribution release was `0.1.0`. Releases use semantic versions and publish `linux/amd64` and `linux/arm64` manifests. Pin a production instance to both a version and the immutable digest recorded on its GitHub release. The current release is:
 
 ```text
-ghcr.io/refueled/kitchook:0.1.0@sha256:<release-digest>
+ghcr.io/refueled/kitchook:0.1.3@sha256:ea97b19f4634941eacbe83a05324f6497dc577cc48736b939fc696d08eac278b
 ```
 
 Do not substitute an image digest from a different tag. The release notes identify the source revision, OCI digest, and supported contract.
@@ -30,7 +30,7 @@ sudo chown 1000:1000 output
 docker run --rm \
   -v "$PWD/my-cookbook:/input:ro" \
   -v "$PWD/output:/output:rw" \
-  ghcr.io/refueled/kitchook:0.1.0@sha256:<release-digest>
+  ghcr.io/refueled/kitchook:0.1.3@sha256:ea97b19f4634941eacbe83a05324f6497dc577cc48736b939fc696d08eac278b
 ```
 
 Astro uses a disposable workspace in the one-shot container's writable layer, then copies only a complete, verified static artifact to `/output`. The default entrypoint is equivalent to `kitchook-build /input /output`. It does not install npm dependencies, modify the input mount, contact a content service, or start a server. The image still executes as the non-root `node` user; do not override it with root.
@@ -41,12 +41,12 @@ On macOS Docker Desktop/Colima, bind mounts may not preserve host ownership for 
 docker volume create kitchook-output
 docker run --rm --user root --entrypoint sh \
   -v kitchook-output:/output \
-  ghcr.io/refueled/kitchook:0.1.0@sha256:<release-digest> \
+  ghcr.io/refueled/kitchook:0.1.3@sha256:ea97b19f4634941eacbe83a05324f6497dc577cc48736b939fc696d08eac278b \
   -c 'chown 1000:1000 /output'
 docker run --rm \
   -v "$PWD/my-cookbook:/input:ro" \
   -v kitchook-output:/output:rw \
-  ghcr.io/refueled/kitchook:0.1.0@sha256:<release-digest>
+  ghcr.io/refueled/kitchook:0.1.3@sha256:ea97b19f4634941eacbe83a05324f6497dc577cc48736b939fc696d08eac278b
 ```
 
 The initialization command is the only root process; the builder remains unprivileged. Mount `kitchook-output` read-only into a static-server container or copy its files out after the build.
@@ -65,7 +65,7 @@ Build a local development image with explicit source metadata:
 
 ```sh
 docker build \
-  --build-arg VERSION=0.1.0-dev \
+  --build-arg VERSION=0.1.3-dev \
   --build-arg REVISION="$(git rev-parse HEAD)" \
   -t kitchook-builder:dev .
 ```

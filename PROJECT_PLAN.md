@@ -12,10 +12,7 @@
 
 ## 1. Background
 
-The original architecture and personal-instance implementation are complete through automated deployment. Those plans are retained as historical records:
-
-- [`docs/plans/2026-08-24-architecture-baseline.md`](docs/plans/2026-08-24-architecture-baseline.md) — original design baseline;
-- [`docs/plans/2026-08-30-personal-instance-v1.md`](docs/plans/2026-08-30-personal-instance-v1.md) — implemented and live-verified personal-instance plan.
+The original architecture and personal-instance implementation are complete through automated deployment. Their durable decisions now live in the current contracts, brand guidance, tests, and infrastructure runbooks. The superseded planning documents were removed from the active tree and remain available in Git history.
 
 The current product already has the correct technical foundation for distribution:
 
@@ -297,20 +294,21 @@ Before public launch:
 
 # 9. Implementation Phases
 
-## Phase 0 — Archive the personal-instance plans
+## Phase 0 — Retire the personal-instance plans
 
-**Status: Complete (2026-08-30).**
+**Status: Complete (2026-08-30; archived plans removed after documentation review).**
 
 Deliverables:
 
-- preserve the original architecture baseline under `docs/plans/`;
-- preserve the completed/live-verified personal-instance plan under `docs/plans/`;
+- carry durable architecture decisions into code-adjacent documentation and tests;
+- retain the live deployment procedure in the infrastructure runbooks;
 - make this document the active `PROJECT_PLAN.md`; and
-- provide an archive index explaining the status of each plan.
+- remove superseded planning documents from the active tree once implementation is complete.
 
 Acceptance:
 
-- historical implementation details remain available;
+- current contracts and runbooks describe the implemented behavior;
+- historical planning remains available in Git history;
 - the root plan describes only the current distribution/public-launch roadmap; and
 - repository references to the active plan remain valid.
 
@@ -343,7 +341,7 @@ Acceptance:
 
 ## Phase 2 — Produce a versioned builder and release process
 
-**Status: Complete (initial `v0.1.0`; current release `v0.1.1`).**
+**Status: Complete (initial `v0.1.0`; current release `v0.1.3`).**
 
 Deliverables:
 

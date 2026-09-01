@@ -1,10 +1,20 @@
 # KitchooK!
 
-**KitchooK!** turns a collection of Markdown recipes and colocated images into a portable, fully static cookbook. Your recipes remain ordinary files; the generated `dist/` directory can be served by any static web server. There is no application server, database, or runtime content service.
+KitchooK! turns Markdown recipes and photos into a fast, searchable static cookbook. Your recipes remain ordinary files, while the built site can be served without an application server or database.
 
-## Quick start: build the examples
+[Documentation](https://kitchook.com/docs/introduction/) · [Live demo](https://demo.kitchook.com) · [Quick start](https://kitchook.com/docs/introduction/quick-start/)
 
-Requirements: Node.js 24 LTS (Node 22.12+ is supported) and npm 9.6.5+.
+## What it does
+
+- Keeps recipes readable as Markdown files with photos beside them.
+- Checks supported metadata and image references during the build.
+- Generates recipe pages, client-side search, optimized images, and a static JSON export.
+- Builds locally with Node.js, in automation, or with the one-shot Docker builder.
+- Produces ordinary static files for a compatible web host.
+
+## Try the bundled examples
+
+Use Node.js 24 LTS (Node.js 22.12 or newer is supported) and npm 9.6.5 or newer:
 
 ```sh
 git clone https://github.com/Refueled/kitchook.git
@@ -15,76 +25,23 @@ npm run build
 npm run preview
 ```
 
-Open the local URL printed by `npm run preview`. The deployable files are in `dist/`; copy the **contents** of that directory to a static host.
+Open the address printed by the preview command. The deployable site is in `dist/`.
 
 ## Build your cookbook
 
-A cookbook is a content directory containing configuration and recipes:
-
-```text
-my-cookbook/
-├── instance.config.json
-└── recipes/
-    └── garlic-butter-pasta/
-        └── recipe.md
-```
-
-```json
-{
-  "title": "My Cookbook",
-  "description": "Recipes our family makes."
-}
-```
-
-```md
----
-title: Garlic Butter Pasta
----
-
-## Ingredients
-
-- 8 oz spaghetti
-- 3 tbsp butter
-
-## Instructions
-
-1. Cook the pasta.
-2. Toss with melted butter.
-```
-
-From a KitchooK! source checkout, build it without modifying application files:
+A cookbook folder contains `instance.config.json` and a `recipes/` directory. From a KitchooK! source checkout, point the build at that folder:
 
 ```sh
 KITCHOOK_CONTENT_DIR=/absolute/path/to/my-cookbook npm run build
 ```
 
-Or use the versioned one-shot OCI builder. Replace the digest with the digest from the selected [GitHub release](docs/releases.md):
+The build reads the selected cookbook folder without modifying it. See the documentation for [recipe authoring](https://kitchook.com/docs/authoring/recipes-and-images/), [configuration](https://kitchook.com/docs/building/configuration/), the [Docker builder](https://kitchook.com/docs/building/builder-container/), and [deployment](https://kitchook.com/docs/deploying/static-web-servers/).
 
-```sh
-mkdir -p output
-sudo chown 1000:1000 output
-docker run --rm \
-  -v "$PWD/my-cookbook:/input:ro" \
-  -v "$PWD/output:/output:rw" \
-  ghcr.io/refueled/kitchook:0.1.0@sha256:<release-digest>
-```
+## Current limits
 
-`output/` then directly contains `index.html`, `recipes/`, `search/index.json`, `api/recipes.json`, and `_astro/`.
-
-## Documentation
-
-- [Author recipes](docs/authoring.md)
-- [Content, configuration, and output contracts](docs/contracts.md)
-- [Build from source or OCI](docs/building.md)
-- [Deploy static files](docs/deploying.md)
-- [GitHub-hosted build automation](docs/github-actions.md)
-- [Upgrade, rollback, and compatibility](docs/releases.md)
-- [Troubleshooting](docs/troubleshooting.md)
-- [Advanced TrueNAS/Caddy deployment](infrastructure/README.md)
-
-## What KitchooK! does not support
-
-KitchooK! does not load raw Markdown from S3 or another service at runtime, run Astro or Node.js in production, provide a database/CMS/editor, host multiple users, or support subpath hosting. It builds a site at an origin root; build first, then host the generated files.
+- At least one recipe must be active; draft and archived recipes are not published.
+- Generated cookbooks must be hosted at the root of a domain or subdomain. Subpath hosting is not supported.
+- Privacy is provided by your source storage and static host, not by recipe status.
 
 ## Development
 
@@ -94,6 +51,6 @@ npm test
 npm run build
 ```
 
-`npm run dev` starts local development. The repository includes intentional public examples only. Keep private recipes in a separate repository or directory, and pin a KitchooK! release independently from that content.
+`npm run dev` starts the cookbook development server. The documentation website is maintained separately under [`website/`](website/).
 
-See [PROJECT_PLAN.md](PROJECT_PLAN.md) for the distribution and public-launch roadmap.
+KitchooK! is available under the [MIT License](LICENSE).

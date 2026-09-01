@@ -34,7 +34,7 @@ sudo chown 1000:1000 output
 docker run --rm \
   -v "$PWD/my-cookbook:/input:ro" \
   -v "$PWD/output:/output:rw" \
-  ghcr.io/refueled/kitchook:0.1.0@sha256:<release-digest>
+  ghcr.io/refueled/kitchook:0.1.3@sha256:ea97b19f4634941eacbe83a05324f6497dc577cc48736b939fc696d08eac278b
 ```
 
 Do not replace the digest with one from another tag. The builder stages and verifies the site before replacing output, so an invalid collection exits nonzero without publishing a partial artifact. It does not install dependencies, start a server, or contact a content service while building.
