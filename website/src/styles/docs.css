@@ -1,5 +1,5 @@
+@import "@kitchook/brand/fonts.css";
 :root { --sl-color-accent-low: #f8d9d9; --sl-color-accent: #a94d50; --sl-color-accent-high: #5f2023; --sl-font: 'DM Sans', system-ui, sans-serif; --sl-color-text-accent: #8a3639; --sl-search-corners: 0; }
-@font-face { font-family: 'DM Sans'; src: url('/fonts/dm-sans-variable-latin.woff2') format('woff2'); font-display: swap; }
 :root[data-theme='dark'] { --sl-color-accent-low: #5f2023; --sl-color-accent: #e99898; --sl-color-accent-high: #f8d9d9; --sl-color-text-accent: #f2b5b5; }
 .docs-wordmark { align-items: center; color: var(--sl-color-text); display: flex; font-family: 'DM Sans', system-ui, sans-serif; font-size: var(--sl-text-h4); letter-spacing: -.07em; line-height: 1; text-decoration: none; white-space: nowrap; }
 .docs-wordmark-name { font-variation-settings: 'wght' 550; transition: font-variation-settings 180ms ease; }
