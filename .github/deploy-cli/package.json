@@ -1,0 +1,13 @@
+{
+  "name": "kitchook-deploy-cli",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Pinned Cloudflare Pages deployment CLI for KitchooK! Cloudflare workflows. It is deliberately outside the application dependency tree so the deployment CLI is never installed into the published OCI builder image, and so deployment does not depend on the marketing site package.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dependencies": {
+    "wrangler": "4.131.0"
+  }
+}
