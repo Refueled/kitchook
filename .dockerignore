@@ -1,7 +1,26 @@
+# Version control and CI configuration
 .git
 .github
+
+# Generated build output and Astro's prerender cache
 .astro
-node_modules
 dist
+**/dist
+
+# Dependencies. Plain `node_modules` only matched the repository root, so a
+# workspace or nested package install (for example website/) was copied into
+# the published builder image by `COPY . .`.
+node_modules
+**/node_modules
+
+# The kitchook.com marketing/docs site is built and deployed by its own
+# workflow; the OCI builder only turns recipe collections into static sites.
+website
+
+# Local environment files
+.env
+.env.*
+
+# Operating systems and logs
 .DS_Store
 *.log

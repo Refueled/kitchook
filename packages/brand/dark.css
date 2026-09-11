@@ -1,0 +1,21 @@
+/*
+ * KitchooK! dark mode.
+ *
+ * Loaded separately from tokens.css so a deliberately light-only surface can
+ * take the palette without silently gaining a dark theme. Dark mode re-points
+ * the foundational paper, surface, ink, and focus colors; the named accents
+ * (yellow, coral, blue, mint) keep their identity and stay paired with
+ * explicit high-contrast ink.
+ */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #fff8e7;
+    --paper: #191817;
+    --surface: #262320;
+    --muted: #d8cfc0;
+    --border: #fff8e7;
+    --shadow: #fff8e7;
+    --focus: #7cc4ff;
+  }
+}

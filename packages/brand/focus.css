@@ -1,0 +1,27 @@
+/*
+ * The KitchooK! focus ring contract.
+ *
+ * Keyboard focus is always a 4px outline with a 4px offset that fades in over
+ * 140 ms by changing color only, so nothing moves and no control changes size.
+ * The outline is present but transparent at rest, which keeps the fade free of
+ * layout work and lets composite controls hand off a single coherent ring.
+ *
+ * Accent colors alone never carry meaning; pair them with text, structure, or
+ * another non-color cue.
+ */
+
+:where(a, button, input, summary, select, textarea, [tabindex]) {
+  outline: 4px solid transparent;
+  outline-offset: 4px;
+  transition: outline-color var(--motion-focus, 140ms) ease-out;
+}
+
+:focus-visible {
+  outline-color: var(--focus);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(a, button, input, summary, select, textarea, [tabindex]) {
+    transition: none;
+  }
+}

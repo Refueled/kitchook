@@ -1,0 +1,28 @@
+{
+  "name": "@kitchook/recipe-schema",
+  "version": "0.1.0",
+  "description": "Canonical KitchooK! recipe frontmatter contract shared by the generator and tooling such as the content manager.",
+  "license": "MIT",
+  "type": "module",
+  "homepage": "https://kitchook.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Refueled/kitchook.git",
+    "directory": "packages/recipe-schema"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

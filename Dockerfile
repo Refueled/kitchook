@@ -5,8 +5,14 @@ FROM node:24.12.0-bookworm-slim@sha256:7326fb2dbdce998edd72140946851be64ef4a643e
 
 FROM base AS dependencies
 WORKDIR /app
+# Workspace manifests must be present for a locked workspace install.
 COPY package.json package-lock.json ./
+COPY packages/recipe-schema/package.json ./packages/recipe-schema/package.json
+COPY packages/brand/package.json ./packages/brand/package.json
 # Locked installation only; lifecycle scripts are intentionally disabled.
+# Note: `--omit=dev` must not be used here. Astro resolves the Sharp image
+# service through optionalDependencies, and omitting dev dependencies prunes
+# that optional subtree, producing a builder that fails during image work.
 RUN npm ci --ignore-scripts
 
 FROM base AS builder
@@ -23,6 +29,7 @@ ENV ASTRO_TELEMETRY_DISABLED=1 \
     HOME=/tmp/home \
     NPM_CONFIG_CACHE=/tmp/npm
 COPY --from=dependencies --chown=node:node /app/node_modules ./node_modules
+# Workspace symlinks in node_modules resolve once the package sources land here.
 COPY --chown=node:node . .
 COPY --chown=node:node infrastructure/builder/entrypoint.sh /usr/local/bin/kitchook-build
 RUN chmod 0555 /usr/local/bin/kitchook-build && chown node:node /app

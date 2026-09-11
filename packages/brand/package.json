@@ -1,0 +1,28 @@
+{
+  "name": "@kitchook/brand",
+  "version": "0.1.0",
+  "description": "The KitchooK! visual identity: design tokens, font faces, and focus contract shared by every first-party surface.",
+  "license": "MIT",
+  "type": "module",
+  "homepage": "https://kitchook.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Refueled/kitchook.git",
+    "directory": "packages/brand"
+  },
+  "exports": {
+    "./brand.css": "./brand.css",
+    "./tokens.css": "./tokens.css",
+    "./dark.css": "./dark.css",
+    "./fonts.css": "./fonts.css",
+    "./focus.css": "./focus.css",
+    "./fonts/*": "./fonts/*"
+  },
+  "files": [
+    "*.css",
+    "fonts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

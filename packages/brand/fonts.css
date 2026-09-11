@@ -1,0 +1,53 @@
+/*
+ * KitchooK! font faces.
+ *
+ * The fonts are self-hosted so the identity never depends on a third-party
+ * request at runtime. Consumers must serve the `fonts/` directory from this
+ * package at `/fonts/` so these URLs resolve.
+ *
+ * Family names here are canonical. The landing site previously declared
+ * "Bricolage" for the same file the generator called "Bricolage Grotesque";
+ * use the stack tokens from tokens.css instead of naming families directly.
+ */
+
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 100 1000;
+  font-display: swap;
+  src: url("/fonts/dm-sans-variable-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bricolage Grotesque";
+  font-style: normal;
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+  font-display: swap;
+  src: url("/fonts/bricolage-grotesque-variable-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Google Sans Flex";
+  font-style: normal;
+  font-weight: 550;
+  font-stretch: 35%;
+  font-display: swap;
+  src: url("/fonts/google-sans-flex-variable-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "M PLUS U";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/m-plus-u-variable-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Syne";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("/fonts/syne-variable-latin.woff2") format("woff2");
+}

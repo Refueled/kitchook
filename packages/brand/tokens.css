@@ -1,0 +1,52 @@
+/*
+ * KitchooK! design tokens.
+ *
+ * The single source of truth for the palette and the hard-edged visual
+ * primitives. Consumers must not re-declare these values; a surface that needs
+ * a new color or measurement adds it here so every first-party surface moves
+ * together.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* Core palette. Coral is the identity and emphasis color and means
+     "important — look here"; the rest support it. */
+  --ink: #171717;
+  --paper: #fff8e7;
+  --surface: #fffdf6;
+  --muted: #5a5045;
+  --border: #171717;
+  --shadow: #171717;
+  --yellow: #fae8a4;
+  --coral: #e99898;
+  --blue: #68b7ff;
+  --mint: #98e9ab;
+
+  /* Ink used on accent-filled surfaces. */
+  --accent-ink: #111111;
+
+  /* Focus ring color; see focus.css for the ring contract. */
+  --focus: #005fcc;
+
+  /* Hard-edged primitive: thick borders and offset, shadowless-looking drops. */
+  --border-width: 3px;
+  --shadow-offset: 6px;
+
+  /* Layout */
+  --content-width: 72rem;
+  --recipe-width: 48rem;
+
+  /* Typography stacks. Family names must match fonts.css exactly. */
+  --heading-font: Impact, Haettenschweiler, "Arial Black", "Franklin Gothic Heavy", sans-serif;
+  --body-font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-wordmark: "DM Sans", var(--body-font);
+  --font-display: "Bricolage Grotesque", var(--heading-font);
+  --font-recipe-title: "Syne", "Arial Black", "Helvetica Neue", Arial, sans-serif;
+  --font-card-title: "Google Sans Flex", var(--heading-font);
+  --font-nav: "M PLUS U", var(--body-font);
+
+  /* Motion durations. Reduced-motion handling is the consumer's responsibility. */
+  --motion-brand: 180ms;
+  --motion-focus: 140ms;
+}

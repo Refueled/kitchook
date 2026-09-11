@@ -1,0 +1,13 @@
+/*
+ * The complete KitchooK! identity stylesheet.
+ *
+ * Import this from a first-party surface to inherit the tokens, font faces,
+ * dark mode, and focus contract. Import the individual files instead when a
+ * surface needs to layer brand assets onto an existing design system (for
+ * example Starlight, which owns its own token names) or must stay light-only.
+ */
+
+@import "./fonts.css";
+@import "./tokens.css";
+@import "./dark.css";
+@import "./focus.css";

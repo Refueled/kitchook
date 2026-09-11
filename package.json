@@ -3,6 +3,9 @@
   "version": "0.1.4",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "astro dev",
     "build": "astro build && node --experimental-strip-types scripts/verify-search-index.ts && node --experimental-strip-types scripts/verify-recipe-api.ts",
@@ -13,6 +16,8 @@
     "node": ">=22.12.0"
   },
   "dependencies": {
+    "@kitchook/brand": "0.1.0",
+    "@kitchook/recipe-schema": "0.1.0",
     "astro": "7.3.2",
     "minisearch": "7.2.0"
   }
