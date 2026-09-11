@@ -6,7 +6,10 @@
 @import "@kitchook/brand/tokens.css";
 @import "@kitchook/brand/focus.css";
 
-:root { color: var(--ink); background: var(--paper); font-family: var(--font-wordmark); }
+/* Light-only, like the page it was before the brand package arrived. The shared
+ * tokens declare `color-scheme: light dark`, which would otherwise tell a
+ * dark-mode browser to draw native chrome dark on a light page. */
+:root { color-scheme: light; color: var(--ink); background: var(--paper); font-family: var(--font-wordmark); }
 * { box-sizing: border-box; }
 body { margin: 0; }
 a { color: inherit; }
