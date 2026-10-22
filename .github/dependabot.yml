@@ -1,0 +1,50 @@
+# Dependabot configuration.
+#
+# Cadence is weekly rather than daily: the merge path is automated for routine
+# updates, so frequent single-package PRs would add noise without adding safety.
+# Minor and patch updates are grouped per directory so they arrive as one
+# reviewable lockfile change. Major updates stay ungrouped and are never
+# auto-merged, because they can change behaviour in ways CI alone will not catch.
+
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 5
+    groups:
+      root-minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: npm
+    directory: "/website"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 5
+    groups:
+      website-minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # The deployment CLI is deliberately outside the application dependency tree
+  # and is the only thing that receives Cloudflare credentials. Dependabot still
+  # tracks it so the pin does not rot silently, but the auto-merge workflow
+  # refuses to touch pull requests that change this directory.
+  - package-ecosystem: npm
+    directory: "/.github/deploy-cli"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 1

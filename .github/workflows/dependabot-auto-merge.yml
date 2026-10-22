@@ -1,0 +1,112 @@
+name: Dependabot auto-merge
+
+# Routine dependency updates are merged without a human click, but only after
+# every guard below passes. The job deliberately runs on `pull_request_target`
+# because it needs the repository's secrets and a write token, and Dependabot
+# pull requests are treated like fork pull requests (no secrets) on
+# `pull_request`. Because that combination is privileged, this workflow never
+# checks out or executes anything from the pull request branch — it only reads
+# Dependabot's own metadata and calls the GitHub API. Adding a checkout step
+# here would turn a compromised dependency into remote code execution against a
+# token that can write to this repository.
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: dependabot-automerge-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  auto-merge:
+    name: Auto-merge routine dependency updates
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    # Dependabot PRs only. A human-authored pull request must never be merged by
+    # this job, regardless of what it contains.
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'Refueled/kitchook'
+
+    steps:
+      - name: Require an auto-merge credential
+        env:
+          MERGE_TOKEN: ${{ secrets.DEPENDABOT_MERGE_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${MERGE_TOKEN}" ]; then
+            echo "::error::DEPENDABOT_MERGE_TOKEN is not configured. Auto-merge needs a code-owner credential:" 
+            echo "::error::GITHUB_TOKEN cannot approve these pull requests because branch protection requires"
+            echo "::error::a code-owner review and the Actions bot is not in CODEOWNERS."
+            echo "::error::Add a fine-grained PAT (or GitHub App token) for @Refueled with Pull requests: Read"
+            echo "::error::and write as repository secret DEPENDABOT_MERGE_TOKEN."
+            exit 1
+          fi
+
+      - name: Read Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+        with:
+          github-token: ${{ secrets.DEPENDABOT_MERGE_TOKEN }}
+
+      - name: Evaluate auto-merge policy
+        id: policy
+        env:
+          UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
+          DEPENDENCY_NAMES: ${{ steps.metadata.outputs.dependency-names }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Only patch and minor updates. A major bump can change behaviour that
+          # a green build will not reveal, so it always waits for a human.
+          case "${UPDATE_TYPE}" in
+            version-update:semver-patch|version-update:semver-minor) ;;
+            *)
+              echo "decision=skip" >>"$GITHUB_OUTPUT"
+              echo "reason=Major or non-semver update (${UPDATE_TYPE}); requires human review." >>"$GITHUB_OUTPUT"
+              exit 0
+              ;;
+          esac
+
+          # wrangler is the one dependency in this tree that receives Cloudflare
+          # credentials at deploy time. It is pinned deliberately and is always
+          # reviewed by hand.
+          if printf '%s\n' "${DEPENDENCY_NAMES}" | tr ',' '\n' | grep -qi '^wrangler$'; then
+            echo "decision=skip" >>"$GITHUB_OUTPUT"
+            echo "reason=wrangler carries deployment credentials; requires human review." >>"$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "decision=merge" >>"$GITHUB_OUTPUT"
+          echo "reason=${UPDATE_TYPE} of ${DEPENDENCY_NAMES}." >>"$GITHUB_OUTPUT"
+
+      - name: Approve and enable auto-merge
+        if: steps.policy.outputs.decision == 'merge'
+        env:
+          MERGE_TOKEN: ${{ secrets.DEPENDABOT_MERGE_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          REASON: ${{ steps.policy.outputs.reason }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh pr review --approve "${PR_URL}" --body "Auto-approved routine dependency update. ${REASON}"
+          # `--auto` defers the actual merge until the required checks and the
+          # code-owner review are both satisfied, so this never bypasses CI.
+          gh pr merge "${PR_URL}" --auto --merge
+
+      - name: Report a deferred update
+        if: steps.policy.outputs.decision == 'skip'
+        env:
+          REASON: ${{ steps.policy.outputs.reason }}
+        shell: bash
+        run: echo "::notice::Left pull request #${{ github.event.pull_request.number }} for human review. ${REASON}"

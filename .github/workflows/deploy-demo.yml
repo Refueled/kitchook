@@ -15,6 +15,7 @@ on:
       - 'public/**'
       - 'scripts/**'
       - 'src/**'
+      - '.github/deploy-cli/**'
       - '.github/workflows/deploy-demo.yml'
   workflow_dispatch:
 

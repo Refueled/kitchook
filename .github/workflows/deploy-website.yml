@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'website/**'
+      - '.github/deploy-cli/**'
       - '.github/workflows/deploy-website.yml'
   workflow_dispatch:
 
@@ -34,7 +35,9 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-          cache-dependency-path: website/package-lock.json
+          cache-dependency-path: |
+            website/package-lock.json
+            .github/deploy-cli/package-lock.json
 
       - name: Install locked website dependencies
         working-directory: website
@@ -46,12 +49,18 @@ jobs:
           npm run check
           npm run build
 
+      # The deployment CLI is installed from its own lockfile, outside the
+      # application dependency tree, so the wrangler that receives Cloudflare
+      # credentials is never the same wrangler dependabot updates in /website.
+      - name: Install pinned deployment CLI
+        working-directory: .github/deploy-cli
+        run: npm ci --ignore-scripts
+
       - name: Deploy completed static artifact
-        working-directory: website
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: >-
-          npx --no-install wrangler pages deploy dist
+          .github/deploy-cli/node_modules/.bin/wrangler pages deploy website/dist
           --project-name=kitchook-com
           --branch=main
