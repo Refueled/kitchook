@@ -111,5 +111,12 @@ jobs:
         if: steps.policy.outputs.decision == 'skip'
         env:
           REASON: ${{ steps.policy.outputs.reason }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         shell: bash
-        run: echo "::notice::Left pull request #${{ github.event.pull_request.number }} for human review. ${REASON}"
+        # Block scalar, not an inline `run: echo "... #${{...}} ..."`. In a plain
+        # single-line scalar YAML treats the space-# as a comment and truncates
+        # the command mid-string, leaving an unbalanced quote. The policy output
+        # is already trusted text, so it is expanded from the environment rather
+        # than interpolated into the script body.
+        run: |
+          echo "::notice::Left pull request #${PR_NUMBER} for human review. ${REASON}"
