@@ -37,13 +37,16 @@ jobs:
     if: github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'Refueled/kitchook'
 
     steps:
+      # gh reads GH_TOKEN (or GITHUB_TOKEN), never an arbitrary name, so the
+      # variable is deliberately named to match what gh consumes. Naming it
+      # something else passes this check and then fails at the approval step.
       - name: Require an auto-merge credential
         env:
-          MERGE_TOKEN: ${{ secrets.DEPENDABOT_MERGE_TOKEN }}
+          GH_TOKEN: ${{ secrets.DEPENDABOT_MERGE_TOKEN }}
         shell: bash
         run: |
           set -euo pipefail
-          if [ -z "${MERGE_TOKEN}" ]; then
+          if [ -z "${GH_TOKEN}" ]; then
             echo "::error::DEPENDABOT_MERGE_TOKEN is not configured. Auto-merge needs a code-owner credential:" 
             echo "::error::GITHUB_TOKEN cannot approve these pull requests because branch protection requires"
             echo "::error::a code-owner review and the Actions bot is not in CODEOWNERS."
@@ -93,7 +96,7 @@ jobs:
       - name: Approve and enable auto-merge
         if: steps.policy.outputs.decision == 'merge'
         env:
-          MERGE_TOKEN: ${{ secrets.DEPENDABOT_MERGE_TOKEN }}
+          GH_TOKEN: ${{ secrets.DEPENDABOT_MERGE_TOKEN }}
           PR_URL: ${{ github.event.pull_request.html_url }}
           REASON: ${{ steps.policy.outputs.reason }}
         shell: bash
