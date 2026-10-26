@@ -18,7 +18,7 @@
   "dependencies": {
     "@kitchook/brand": "0.1.0",
     "@kitchook/recipe-schema": "0.1.0",
-    "astro": "7.4.1",
+    "astro": "7.4.2",
     "minisearch": "7.2.0"
   }
 }
